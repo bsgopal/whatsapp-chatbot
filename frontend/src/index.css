@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Scrollbar ── */
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #2A3A4D; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #00E676; }
+
+/* ── Base ── */
+* { box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; background: #03060F; }
+body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-font-smoothing: antialiased; }
+
+/* ── Custom utilities ── */
+@layer components {
+  .btn-em {
+    @apply bg-gradient-to-r from-em to-teal text-black font-bold text-sm rounded-lg px-4 py-2 flex items-center gap-2 transition-all hover:brightness-110 hover:shadow-em active:scale-95 cursor-pointer border-0;
+  }
+  .btn-ghost {
+    @apply bg-ink-4 border border-ink-7 text-mist-2 font-semibold text-sm rounded-lg px-4 py-2 flex items-center gap-2 transition-all hover:bg-ink-5 hover:text-white cursor-pointer;
+  }
+  .btn-danger {
+    @apply bg-rose/10 border border-rose/30 text-rose font-semibold text-sm rounded-lg px-4 py-2 flex items-center gap-2 transition-all hover:bg-rose/20 cursor-pointer;
+  }
+  .card {
+    @apply bg-ink-4 border border-ink-6 rounded-xl;
+  }
+  .input {
+    @apply w-full bg-ink-3 border border-ink-6 rounded-lg px-3 py-2 text-sm text-white placeholder-stone-2 focus:outline-none focus:border-em focus:ring-1 focus:ring-em/30 transition-colors;
+  }
+  .label {
+    @apply block text-2xs font-semibold text-stone-2 uppercase tracking-wider mb-1.5;
+  }
+  .badge-em {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-bold bg-em/10 border border-em/30 text-em;
+  }
+  .badge-sky {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-bold bg-sky/10 border border-sky/30 text-sky;
+  }
+  .badge-amber {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-bold bg-amber/10 border border-amber/30 text-amber;
+  }
+  .badge-rose {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-bold bg-rose/10 border border-rose/30 text-rose;
+  }
+  .badge-violet {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-bold bg-violet/10 border border-violet/30 text-violet;
+  }
+  .sidebar-item {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-stone-2 hover:bg-ink-5 hover:text-white cursor-pointer transition-all;
+  }
+  .sidebar-item-active {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-em/8 border-l-2 border-em text-em cursor-pointer;
+  }
+  .stat-card {
+    @apply card p-5 flex flex-col gap-3 hover:border-ink-7 transition-colors cursor-default;
+  }
+  .topbar {
+    @apply flex items-center justify-between px-6 py-4 border-b border-ink-6 bg-ink-2 flex-shrink-0;
+  }
+}
+
+/* ── Animations ── */
+.fu  { animation: fadeUp 0.4s ease both; }
+.fu1 { animation: fadeUp 0.4s ease 0.05s both; }
+.fu2 { animation: fadeUp 0.4s ease 0.10s both; }
+.fu3 { animation: fadeUp 0.4s ease 0.15s both; }
+.fu4 { animation: fadeUp 0.4s ease 0.20s both; }
+.fu5 { animation: fadeUp 0.4s ease 0.25s both; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes gemPulse {
+  0%,100% { box-shadow: 0 0 0 1px rgba(0,230,118,.35), 0 4px 20px rgba(0,230,118,.18); }
+  50% { box-shadow: 0 0 20px rgba(0,230,118,.4), 0 0 40px rgba(0,230,118,.15); }
+}
+@keyframes dot-pulse {
+  0%,100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.dot-pulse { animation: dot-pulse 2s ease-in-out infinite; }
