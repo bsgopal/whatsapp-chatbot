@@ -1,102 +1,142 @@
 // ============================================================
-//  src/appointmentStore.js  —  Stores all booked appointments
-//  (in-memory for simplicity; swap with a DB for production)
+//  src/appointmentStore.js  —  Persistent appointment store
+//  Uses node-persist (file-based) so data survives restarts
 // ============================================================
 
 const { v4: uuidv4 } = require("uuid");
+const storage        = require("node-persist");
+const path           = require("path");
 
-// appointments[phone] = [ { id, businessId, staffId, date, slot, name, status } ]
-const appointments = {};
+let initialized = false;
 
-function getByPhone(phone) {
-  return appointments[phone] || [];
+async function init() {
+  if (initialized) return;
+  await storage.init({
+    dir: path.join(__dirname, "../data/.store"),
+    stringify: JSON.stringify,
+    parse: JSON.parse,
+    encoding: "utf8",
+    logging: false,
+    ttl: false,
+  });
+  initialized = true;
 }
 
-function getAll() {
-  return appointments;
+// ── Internal helpers ──────────────────────────────────────────
+
+async function _load() {
+  await init();
+  return (await storage.getItem("appointments")) || {};
 }
 
-function book({ phone, name, businessId, businessName, staffId, staffName, date, slot }) {
-  if (!appointments[phone]) appointments[phone] = [];
+async function _save(data) {
+  await init();
+  await storage.setItem("appointments", data);
+}
+
+// ── Public API ────────────────────────────────────────────────
+
+async function getByPhone(phone) {
+  const db = await _load();
+  return db[phone] || [];
+}
+
+async function getAll() {
+  return await _load();
+}
+
+async function book({ phone, name, businessId, businessName, staffId, staffName,
+                      serviceId, serviceName, servicePrice, serviceDuration,
+                      date, slot }) {
+  const db = await _load();
+  if (!db[phone]) db[phone] = [];
 
   // Prevent double-booking same slot for same staff
-  const conflict = Object.values(appointments)
+  const conflict = Object.values(db)
     .flat()
-    .find(
-      (a) =>
-        a.businessId === businessId &&
-        a.staffId    === staffId    &&
-        a.date       === date       &&
-        a.slot       === slot       &&
-        a.status     === "confirmed"
+    .find(a =>
+      a.businessId === businessId &&
+      a.staffId    === staffId    &&
+      a.date       === date       &&
+      a.slot       === slot       &&
+      a.status     === "confirmed"
     );
 
   if (conflict) return { success: false, reason: "slot_taken" };
 
   const appt = {
-    id:           uuidv4().slice(0, 8).toUpperCase(),
+    id:              uuidv4().slice(0, 8).toUpperCase(),
     phone,
     name,
     businessId,
     businessName,
     staffId,
     staffName,
+    serviceId,
+    serviceName,
+    servicePrice,
+    serviceDuration,
     date,
     slot,
-    status:       "confirmed",
-    bookedAt:     new Date().toISOString(),
+    status:          "confirmed",
+    bookedAt:        new Date().toISOString(),
   };
 
-  appointments[phone].push(appt);
+  db[phone].push(appt);
+  await _save(db);
   return { success: true, appointment: appt };
 }
 
-function cancel(phone, apptId) {
-  const list = appointments[phone] || [];
-  const appt = list.find((a) => a.id === apptId);
-  if (!appt) return { success: false, reason: "not_found" };
-  if (appt.status === "cancelled") return { success: false, reason: "already_cancelled" };
+async function cancel(phone, apptId) {
+  const db   = await _load();
+  const list = db[phone] || [];
+  const appt = list.find(a => a.id === apptId);
+  if (!appt)                        return { success: false, reason: "not_found" };
+  if (appt.status === "cancelled")  return { success: false, reason: "already_cancelled" };
   appt.status = "cancelled";
+  appt.cancelledAt = new Date().toISOString();
+  await _save(db);
   return { success: true, appointment: appt };
 }
 
-function reschedule(phone, apptId, newDate, newSlot) {
-  const list = appointments[phone] || [];
-  const appt = list.find((a) => a.id === apptId);
-  if (!appt) return { success: false, reason: "not_found" };
+async function reschedule(phone, apptId, newDate, newSlot) {
+  const db   = await _load();
+  const list = db[phone] || [];
+  const appt = list.find(a => a.id === apptId);
+  if (!appt)                       return { success: false, reason: "not_found" };
   if (appt.status === "cancelled") return { success: false, reason: "cancelled" };
 
-  // Check new slot availability
-  const conflict = Object.values(appointments)
+  const conflict = Object.values(db)
     .flat()
-    .find(
-      (a) =>
-        a.businessId === appt.businessId &&
-        a.staffId    === appt.staffId    &&
-        a.date       === newDate         &&
-        a.slot       === newSlot         &&
-        a.status     === "confirmed"     &&
-        a.id         !== apptId
+    .find(a =>
+      a.businessId === appt.businessId &&
+      a.staffId    === appt.staffId    &&
+      a.date       === newDate         &&
+      a.slot       === newSlot         &&
+      a.status     === "confirmed"     &&
+      a.id         !== apptId
     );
 
   if (conflict) return { success: false, reason: "slot_taken" };
 
-  appt.date = newDate;
-  appt.slot = newSlot;
+  appt.date          = newDate;
+  appt.slot          = newSlot;
+  appt.rescheduledAt = new Date().toISOString();
+  await _save(db);
   return { success: true, appointment: appt };
 }
 
-function getTakenSlots(businessId, staffId, date) {
-  return Object.values(appointments)
+async function getTakenSlots(businessId, staffId, date) {
+  const db = await _load();
+  return Object.values(db)
     .flat()
-    .filter(
-      (a) =>
-        a.businessId === businessId &&
-        a.staffId    === staffId    &&
-        a.date       === date       &&
-        a.status     === "confirmed"
+    .filter(a =>
+      a.businessId === businessId &&
+      a.staffId    === staffId    &&
+      a.date       === date       &&
+      a.status     === "confirmed"
     )
-    .map((a) => a.slot);
+    .map(a => a.slot);
 }
 
 module.exports = { getByPhone, getAll, book, cancel, reschedule, getTakenSlots };

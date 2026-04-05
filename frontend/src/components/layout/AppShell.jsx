@@ -16,6 +16,7 @@ const NAV = [
   { path: '/analytics', label: 'Analytics', icon: '📊' },
   { path: '/staff', label: 'Staff', icon: '👤' },
   { path: '/services', label: 'Services', icon: '✂️' },
+  { path: '/admin', label: 'Bot Dashboard', icon: '🤖' },
   { path: '/settings', label: 'Settings', icon: '⚙️' },
 ];
 
