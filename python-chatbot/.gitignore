@@ -2,3 +2,6 @@ python-chatbot/node_modules/
 python-chatbot/.wwebjs_auth/
 python-chatbot/.wwebjs_cache/
 python-chatbot/package-lock.json
+
+python-chatbot/.wwebjs_auth/
+backend/logs/

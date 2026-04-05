@@ -1,73 +1,167 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import QRCode from "react-qr-code";
 
 const API = "http://localhost:3001/api";
 
-const STATUS_COLOR = {
-  confirmed: { bg: "#d1fae5", text: "#065f46", dot: "#10b981" },
-  cancelled:  { bg: "#fee2e2", text: "#991b1b", dot: "#ef4444" },
-};
+// ── Helpers ──────────────────────────────────────────────────
+const fmt = (iso) =>
+  new Date(iso).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+const fmtTime = (iso) =>
+  new Date(iso).toLocaleString("en-IN", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
+const phone = (p) => p?.replace("@c.us", "") || "";
 
-const BIZ_ICONS = {
-  "Doctor":       "🏥",
-  "Hair Salon":   "💇",
-  "Gym / Fitness":"💪",
-};
+const BIZ_EMOJI = { Doctor: "🏥", "Hair Salon": "💇", "Gym / Fitness": "💪" };
 
-function StatCard({ label, value, sub, color }) {
+// ── Sub-components ───────────────────────────────────────────
+function StatCard({ label, value, icon, color }) {
   return (
     <div style={{
-      background: "#fff",
-      borderRadius: 14,
-      padding: "22px 28px",
-      boxShadow: "0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04)",
-      borderLeft: `4px solid ${color}`,
-      minWidth: 160,
-      flex: 1,
+      background: "#fff", borderRadius: 14, padding: "20px 24px",
+      boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+      borderTop: `3px solid ${color}`, flex: 1, minWidth: 140,
     }}>
-      <div style={{ fontSize: 32, fontWeight: 700, color, lineHeight: 1 }}>{value}</div>
-      <div style={{ fontSize: 13, fontWeight: 600, color: "#374151", marginTop: 6 }}>{label}</div>
-      {sub && <div style={{ fontSize: 11, color: "#9ca3af", marginTop: 2 }}>{sub}</div>}
+      <div style={{ fontSize: 26 }}>{icon}</div>
+      <div style={{ fontSize: 30, fontWeight: 700, color, marginTop: 6, lineHeight: 1 }}>{value}</div>
+      <div style={{ fontSize: 12, color: "#6b7280", marginTop: 4, fontWeight: 500 }}>{label}</div>
     </div>
   );
 }
 
 function Badge({ status }) {
-  const c = STATUS_COLOR[status] || { bg: "#f3f4f6", text: "#374151", dot: "#6b7280" };
+  const styles = {
+    confirmed: { bg: "#dcfce7", color: "#166534", dot: "#22c55e" },
+    cancelled:  { bg: "#fee2e2", color: "#991b1b", dot: "#ef4444" },
+  };
+  const s = styles[status] || { bg: "#f3f4f6", color: "#374151", dot: "#9ca3af" };
   return (
     <span style={{
       display: "inline-flex", alignItems: "center", gap: 5,
-      background: c.bg, color: c.text,
-      borderRadius: 20, padding: "3px 10px", fontSize: 11, fontWeight: 600,
+      background: s.bg, color: s.color,
+      padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 600,
     }}>
-      <span style={{ width: 6, height: 6, borderRadius: "50%", background: c.dot, display: "inline-block" }} />
+      <span style={{ width: 6, height: 6, borderRadius: "50%", background: s.dot }} />
       {status}
     </span>
   );
 }
 
+// ── QR Setup Panel ───────────────────────────────────────────
+function QRPanel() {
+  const [qrData, setQrData]   = useState(null);
+  const [status, setStatus]   = useState("loading");
+  const intervalRef           = useRef(null);
+
+  const poll = useCallback(async () => {
+    try {
+      const res  = await fetch(`${API}/qr-status`);
+      const data = await res.json();
+      setStatus(data.status);
+      setQrData(data.qr);
+      if (data.status === "connected") clearInterval(intervalRef.current);
+    } catch {
+      setStatus("error");
+    }
+  }, []);
+
+  useEffect(() => {
+    poll();
+    intervalRef.current = setInterval(poll, 3000);
+    return () => clearInterval(intervalRef.current);
+  }, [poll]);
+
+  if (status === "connected") return (
+    <div style={{
+      background: "#f0fdf4", border: "1px solid #bbf7d0",
+      borderRadius: 12, padding: "16px 20px",
+      display: "flex", alignItems: "center", gap: 12, marginBottom: 24,
+    }}>
+      <span style={{ fontSize: 22 }}>✅</span>
+      <div>
+        <div style={{ fontWeight: 600, color: "#166534", fontSize: 14 }}>WhatsApp Bot Connected</div>
+        <div style={{ fontSize: 12, color: "#16a34a" }}>Bot is live and accepting messages</div>
+      </div>
+    </div>
+  );
+
+  if (status === "qr_ready" && qrData) return (
+    <div style={{
+      background: "#fff", borderRadius: 14, padding: "24px",
+      boxShadow: "0 1px 4px rgba(0,0,0,0.08)", marginBottom: 24,
+      display: "flex", gap: 28, alignItems: "center", flexWrap: "wrap",
+    }}>
+      <div style={{
+        background: "#fff", padding: 12, borderRadius: 12,
+        border: "2px solid #e5e7eb", display: "inline-block",
+      }}>
+        <QRCode value={qrData} size={140} />
+      </div>
+      <div>
+        <div style={{ fontWeight: 700, fontSize: 16, color: "#111827", marginBottom: 6 }}>
+          📱 Scan to Connect WhatsApp Bot
+        </div>
+        <div style={{ fontSize: 13, color: "#6b7280", lineHeight: 1.7 }}>
+          1. Open WhatsApp on your phone<br />
+          2. Go to <b>Settings → Linked Devices</b><br />
+          3. Tap <b>Link a Device</b><br />
+          4. Scan this QR code
+        </div>
+        <div style={{
+          marginTop: 10, fontSize: 11, color: "#9ca3af",
+          display: "flex", alignItems: "center", gap: 6,
+        }}>
+          <span style={{
+            width: 8, height: 8, borderRadius: "50%", background: "#f59e0b",
+            display: "inline-block", animation: "pulse 1.5s infinite",
+          }} />
+          QR refreshes automatically every 3 seconds
+        </div>
+      </div>
+    </div>
+  );
+
+  if (status === "error") return (
+    <div style={{
+      background: "#fef2f2", border: "1px solid #fecaca",
+      borderRadius: 12, padding: "16px 20px", marginBottom: 24,
+      color: "#991b1b", fontSize: 13,
+    }}>
+      ⚠️ Cannot connect to bot. Make sure <code>node src/bot.js</code> is running.
+    </div>
+  );
+
+  return (
+    <div style={{
+      background: "#f9fafb", borderRadius: 12, padding: "16px 20px",
+      marginBottom: 24, color: "#6b7280", fontSize: 13,
+    }}>
+      ⏳ Connecting to bot...
+    </div>
+  );
+}
+
+// ── Main Dashboard ───────────────────────────────────────────
 export default function AdminDashboard() {
   const [appointments, setAppointments] = useState([]);
   const [stats, setStats]               = useState(null);
   const [loading, setLoading]           = useState(true);
   const [error, setError]               = useState(null);
-  const [filter, setFilter]             = useState("all");       // all | confirmed | cancelled
+  const [statusFilter, setStatusFilter] = useState("all");
   const [bizFilter, setBizFilter]       = useState("all");
   const [search, setSearch]             = useState("");
   const [lastRefresh, setLastRefresh]   = useState(null);
 
   const fetchData = useCallback(async () => {
     try {
-      const [apptRes, statsRes] = await Promise.all([
-        fetch(`${API}/appointments`),
-        fetch(`${API}/stats`),
+      const [a, s] = await Promise.all([
+        fetch(`${API}/appointments`).then(r => r.json()),
+        fetch(`${API}/stats`).then(r => r.json()),
       ]);
-      if (!apptRes.ok) throw new Error("Bot API not reachable");
-      setAppointments(await apptRes.json());
-      setStats(await statsRes.json());
+      setAppointments(a);
+      setStats(s);
       setLastRefresh(new Date());
       setError(null);
-    } catch (e) {
-      setError("Cannot connect to bot API. Make sure the bot is running (node src/bot.js).");
+    } catch {
+      setError("Bot API unreachable. Run: node src/bot.js");
     } finally {
       setLoading(false);
     }
@@ -75,100 +169,114 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     fetchData();
-    const t = setInterval(fetchData, 15000); // auto-refresh every 15s
+    const t = setInterval(fetchData, 15000);
     return () => clearInterval(t);
   }, [fetchData]);
 
-  // Filtered list
+  const uniqueBiz = [...new Map(
+    appointments.map(a => [a.businessId, { id: a.businessId, name: a.businessName }])
+  ).values()];
+
   const filtered = appointments.filter(a => {
-    if (filter !== "all"    && a.status       !== filter)       return false;
-    if (bizFilter !== "all" && a.businessId   !== bizFilter)    return false;
-    if (search && ![a.name, a.phone, a.businessName, a.staffName]
-      .join(" ").toLowerCase().includes(search.toLowerCase()))  return false;
+    if (statusFilter !== "all" && a.status !== statusFilter) return false;
+    if (bizFilter    !== "all" && a.businessId !== bizFilter) return false;
+    if (search && ![a.name, phone(a.phone), a.businessName, a.staffName]
+      .join(" ").toLowerCase().includes(search.toLowerCase())) return false;
     return true;
   });
 
-  const uniqueBizIds = [...new Set(appointments.map(a => ({ id: a.businessId, name: a.businessName }))
-    .map(JSON.stringify))].map(JSON.parse);
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const todayCount = appointments.filter(
+    a => a.status === "confirmed" && a.date === todayStr
+  ).length;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f9fafb", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#f3f4f6", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
+      <style>{`
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+        tr:hover td { background: #f9fafb !important; }
+        input:focus, select:focus { outline: 2px solid #6366f1; outline-offset: 1px; }
+        ::-webkit-scrollbar { height: 6px; }
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+      `}</style>
 
-      {/* Header */}
+      {/* ── Header ── */}
       <div style={{
-        background: "#fff",
-        borderBottom: "1px solid #e5e7eb",
-        padding: "0 32px",
+        background: "#fff", borderBottom: "1px solid #e5e7eb",
+        padding: "0 28px", height: 60,
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        height: 64,
+        position: "sticky", top: 0, zIndex: 100,
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{
-            width: 36, height: 36, borderRadius: 10,
-            background: "linear-gradient(135deg, #25d366, #128c7e)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 18,
-          }}>📋</div>
+            width: 34, height: 34, borderRadius: 9,
+            background: "linear-gradient(135deg,#25d366,#128c7e)",
+            display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17,
+          }}>📅</div>
           <div>
-            <div style={{ fontWeight: 700, fontSize: 16, color: "#111827" }}>Appointment Admin</div>
-            <div style={{ fontSize: 11, color: "#9ca3af" }}>WhatsApp Bot Dashboard</div>
+            <div style={{ fontWeight: 700, fontSize: 15, color: "#111827" }}>Appointment Admin</div>
+            <div style={{ fontSize: 10, color: "#9ca3af" }}>WhatsApp Bot Dashboard</div>
           </div>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           {lastRefresh && (
             <span style={{ fontSize: 11, color: "#9ca3af" }}>
               Updated {lastRefresh.toLocaleTimeString()}
             </span>
           )}
           <button onClick={fetchData} style={{
-            background: "#f3f4f6", border: "none", borderRadius: 8,
-            padding: "7px 14px", fontSize: 12, fontWeight: 600,
-            color: "#374151", cursor: "pointer",
+            background: "#f3f4f6", border: "1px solid #e5e7eb",
+            borderRadius: 8, padding: "6px 14px", fontSize: 12,
+            fontWeight: 600, color: "#374151", cursor: "pointer",
           }}>⟳ Refresh</button>
         </div>
       </div>
 
-      <div style={{ padding: "28px 32px", maxWidth: 1200, margin: "0 auto" }}>
+      <div style={{ padding: "24px 28px", maxWidth: 1280, margin: "0 auto" }}>
 
-        {/* Error banner */}
+        {/* ── QR Panel ── */}
+        <QRPanel />
+
+        {/* ── Error ── */}
         {error && (
           <div style={{
             background: "#fef2f2", border: "1px solid #fecaca",
-            borderRadius: 10, padding: "14px 20px", marginBottom: 24,
+            borderRadius: 10, padding: "12px 18px", marginBottom: 20,
             color: "#991b1b", fontSize: 13,
-          }}>
-            ⚠️ {error}
-          </div>
+          }}>⚠️ {error}</div>
         )}
 
-        {/* Stat cards */}
+        {/* ── Stat Cards ── */}
         {stats && (
-          <div style={{ display: "flex", gap: 16, marginBottom: 28, flexWrap: "wrap" }}>
-            <StatCard label="Total Booked"   value={stats.confirmed}  color="#10b981" sub="confirmed appointments" />
-            <StatCard label="Cancelled"       value={stats.cancelled}  color="#ef4444" sub="by users" />
-            <StatCard label="Unique Users"    value={stats.totalUsers} color="#6366f1" sub="WhatsApp numbers" />
-            <StatCard label="Total Messages"  value={appointments.length} color="#f59e0b" sub="all time" />
+          <div style={{ display: "flex", gap: 14, marginBottom: 20, flexWrap: "wrap" }}>
+            <StatCard label="Total Confirmed" value={stats.confirmed}  icon="✅" color="#22c55e" />
+            <StatCard label="Cancelled"        value={stats.cancelled}  icon="❌" color="#ef4444" />
+            <StatCard label="Unique Users"     value={stats.totalUsers} icon="👥" color="#6366f1" />
+            <StatCard label="Today's Bookings" value={todayCount}       icon="📅" color="#f59e0b" />
           </div>
         )}
 
-        {/* Business breakdown */}
+        {/* ── Business Breakdown ── */}
         {stats?.byBusiness && (
           <div style={{
-            background: "#fff", borderRadius: 14, padding: "20px 24px",
-            boxShadow: "0 1px 3px rgba(0,0,0,0.07)", marginBottom: 24,
+            background: "#fff", borderRadius: 14, padding: "18px 22px",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.07)", marginBottom: 20,
           }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: "#374151", marginBottom: 14 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "#6b7280", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 12 }}>
               Bookings by Business
             </div>
-            <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
               {Object.entries(stats.byBusiness).map(([name, count]) => (
                 <div key={name} style={{
+                  flex: 1, minWidth: 150,
+                  background: "#f9fafb", borderRadius: 10, padding: "12px 16px",
                   display: "flex", alignItems: "center", gap: 10,
-                  background: "#f9fafb", borderRadius: 10, padding: "10px 16px", flex: 1, minWidth: 160,
                 }}>
-                  <span style={{ fontSize: 22 }}>{BIZ_ICONS[Object.values(BIZ_ICONS)[0]] || "🏢"}</span>
+                  <span style={{ fontSize: 24 }}>
+                    {Object.entries(BIZ_EMOJI).find(([k]) => name.toLowerCase().includes(k.toLowerCase()))?.[1] || "🏢"}
+                  </span>
                   <div>
-                    <div style={{ fontSize: 20, fontWeight: 700, color: "#111827" }}>{count}</div>
+                    <div style={{ fontSize: 22, fontWeight: 700, color: "#111827" }}>{count}</div>
                     <div style={{ fontSize: 11, color: "#6b7280" }}>{name}</div>
                   </div>
                 </div>
@@ -177,107 +285,95 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* Filters */}
+        {/* ── Filters ── */}
         <div style={{
-          background: "#fff", borderRadius: 14, padding: "16px 20px",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.07)", marginBottom: 20,
-          display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center",
+          background: "#fff", borderRadius: 14, padding: "14px 18px",
+          boxShadow: "0 1px 4px rgba(0,0,0,0.07)", marginBottom: 16,
+          display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center",
         }}>
           <input
-            placeholder="🔍  Search name, phone, business..."
+            placeholder="🔍 Search name, phone, business..."
             value={search}
             onChange={e => setSearch(e.target.value)}
             style={{
-              border: "1px solid #e5e7eb", borderRadius: 8, padding: "8px 14px",
-              fontSize: 13, flex: 1, minWidth: 220, outline: "none", color: "#111827",
+              flex: 1, minWidth: 200, border: "1px solid #e5e7eb",
+              borderRadius: 8, padding: "8px 12px", fontSize: 13, color: "#111827",
             }}
           />
-          {["all","confirmed","cancelled"].map(s => (
-            <button key={s} onClick={() => setFilter(s)} style={{
+          {["all", "confirmed", "cancelled"].map(s => (
+            <button key={s} onClick={() => setStatusFilter(s)} style={{
               padding: "8px 16px", borderRadius: 8, fontSize: 12, fontWeight: 600,
-              border: filter === s ? "none" : "1px solid #e5e7eb",
-              background: filter === s ? "#111827" : "#fff",
-              color: filter === s ? "#fff" : "#6b7280",
+              border: statusFilter === s ? "none" : "1px solid #e5e7eb",
+              background: statusFilter === s ? "#111827" : "#fff",
+              color: statusFilter === s ? "#fff" : "#6b7280",
               cursor: "pointer", textTransform: "capitalize",
             }}>{s}</button>
           ))}
-          <select
-            value={bizFilter}
-            onChange={e => setBizFilter(e.target.value)}
-            style={{
-              border: "1px solid #e5e7eb", borderRadius: 8, padding: "8px 14px",
-              fontSize: 12, color: "#374151", outline: "none", background: "#fff",
-            }}
-          >
+          <select value={bizFilter} onChange={e => setBizFilter(e.target.value)} style={{
+            border: "1px solid #e5e7eb", borderRadius: 8,
+            padding: "8px 12px", fontSize: 12, color: "#374151", background: "#fff",
+          }}>
             <option value="all">All Businesses</option>
-            {uniqueBizIds.map(b => (
-              <option key={b.id} value={b.id}>{b.name}</option>
-            ))}
+            {uniqueBiz.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
           </select>
         </div>
 
-        {/* Table */}
+        {/* ── Table ── */}
         <div style={{
           background: "#fff", borderRadius: 14,
-          boxShadow: "0 1px 3px rgba(0,0,0,0.07)", overflow: "hidden",
+          boxShadow: "0 1px 4px rgba(0,0,0,0.07)", overflow: "hidden",
         }}>
-          {loading ? (
-            <div style={{ padding: 60, textAlign: "center", color: "#9ca3af", fontSize: 14 }}>
-              Loading appointments...
-            </div>
-          ) : filtered.length === 0 ? (
-            <div style={{ padding: 60, textAlign: "center", color: "#9ca3af", fontSize: 14 }}>
-              No appointments found.
-            </div>
-          ) : (
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
-              <thead>
-                <tr style={{ background: "#f9fafb", borderBottom: "1px solid #e5e7eb" }}>
-                  {["ID","Customer","Phone","Business","Staff","Date","Time","Status","Booked At"].map(h => (
-                    <th key={h} style={{
-                      padding: "12px 16px", textAlign: "left",
-                      fontWeight: 600, color: "#6b7280", fontSize: 11,
-                      textTransform: "uppercase", letterSpacing: "0.05em",
-                    }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((a, i) => (
-                  <tr key={a.id} style={{
-                    borderBottom: "1px solid #f3f4f6",
-                    background: i % 2 === 0 ? "#fff" : "#fafafa",
-                  }}>
-                    <td style={{ padding: "13px 16px" }}>
-                      <code style={{ fontSize: 11, background: "#f3f4f6", padding: "2px 6px", borderRadius: 4, color: "#374151" }}>
-                        {a.id}
-                      </code>
-                    </td>
-                    <td style={{ padding: "13px 16px", fontWeight: 600, color: "#111827" }}>{a.name}</td>
-                    <td style={{ padding: "13px 16px", color: "#6b7280", fontFamily: "monospace", fontSize: 12 }}>
-                      {a.phone?.replace("@c.us", "")}
-                    </td>
-                    <td style={{ padding: "13px 16px", color: "#374151" }}>{a.businessName}</td>
-                    <td style={{ padding: "13px 16px", color: "#374151" }}>{a.staffName}</td>
-                    <td style={{ padding: "13px 16px", color: "#374151" }}>
-                      {new Date(a.date).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
-                    </td>
-                    <td style={{ padding: "13px 16px", color: "#374151", fontWeight: 600 }}>{a.slot}</td>
-                    <td style={{ padding: "13px 16px" }}><Badge status={a.status} /></td>
-                    <td style={{ padding: "13px 16px", color: "#9ca3af", fontSize: 11 }}>
-                      {new Date(a.bookedAt).toLocaleString("en-IN", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
-                    </td>
+          <div style={{ overflowX: "auto" }}>
+            {loading ? (
+              <div style={{ padding: 60, textAlign: "center", color: "#9ca3af" }}>Loading...</div>
+            ) : filtered.length === 0 ? (
+              <div style={{ padding: 60, textAlign: "center", color: "#9ca3af" }}>
+                {appointments.length === 0
+                  ? "No appointments yet. Send 'hi' on WhatsApp to book one!"
+                  : "No results match your filter."}
+              </div>
+            ) : (
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                <thead>
+                  <tr style={{ background: "#f9fafb", borderBottom: "2px solid #e5e7eb" }}>
+                    {["Booking ID","Customer","Phone","Business","Staff","Date","Time","Status","Booked At"].map(h => (
+                      <th key={h} style={{
+                        padding: "11px 14px", textAlign: "left",
+                        fontSize: 11, fontWeight: 700, color: "#6b7280",
+                        textTransform: "uppercase", letterSpacing: "0.05em",
+                        whiteSpace: "nowrap",
+                      }}>{h}</th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+                </thead>
+                <tbody>
+                  {filtered.map((a, i) => (
+                    <tr key={a.id} style={{ borderBottom: "1px solid #f3f4f6" }}>
+                      <td style={{ padding: "12px 14px" }}>
+                        <code style={{
+                          background: "#f3f4f6", color: "#374151",
+                          padding: "2px 7px", borderRadius: 5, fontSize: 11, fontWeight: 600,
+                        }}>{a.id}</code>
+                      </td>
+                      <td style={{ padding: "12px 14px", fontWeight: 600, color: "#111827", whiteSpace: "nowrap" }}>{a.name}</td>
+                      <td style={{ padding: "12px 14px", color: "#6b7280", fontFamily: "monospace", fontSize: 12 }}>+{phone(a.phone)}</td>
+                      <td style={{ padding: "12px 14px", color: "#374151", whiteSpace: "nowrap" }}>{a.businessName}</td>
+                      <td style={{ padding: "12px 14px", color: "#374151", whiteSpace: "nowrap" }}>{a.staffName}</td>
+                      <td style={{ padding: "12px 14px", color: "#374151", whiteSpace: "nowrap" }}>{fmt(a.date + "T00:00:00")}</td>
+                      <td style={{ padding: "12px 14px", fontWeight: 600, color: "#111827", whiteSpace: "nowrap" }}>{a.slot}</td>
+                      <td style={{ padding: "12px 14px" }}><Badge status={a.status} /></td>
+                      <td style={{ padding: "12px 14px", color: "#9ca3af", fontSize: 11, whiteSpace: "nowrap" }}>{fmtTime(a.bookedAt)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
 
-          {/* Footer count */}
           {filtered.length > 0 && (
             <div style={{
-              padding: "12px 20px", background: "#f9fafb",
-              borderTop: "1px solid #e5e7eb", fontSize: 11, color: "#9ca3af",
+              padding: "10px 18px", borderTop: "1px solid #f3f4f6",
+              fontSize: 11, color: "#9ca3af", background: "#fafafa",
             }}>
               Showing {filtered.length} of {appointments.length} appointments
             </div>

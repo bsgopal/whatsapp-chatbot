@@ -604,3 +604,4 @@
 {"level":"info","message":"Socket connected: cISHnMDrGAomrz6zAAAH","timestamp":"2026-04-04 22:12:16"}
 {"level":"info","message":"Socket cISHnMDrGAomrz6zAAAH joined room business_69be728253a006a18f55d266","timestamp":"2026-04-04 22:12:16"}
 {"level":"info","message":"Socket cISHnMDrGAomrz6zAAAH joined room business_69be728253a006a18f55d266","timestamp":"2026-04-04 22:12:16"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2026-04-05 13:00:26"}

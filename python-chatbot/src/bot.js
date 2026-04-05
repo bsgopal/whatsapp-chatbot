@@ -1,75 +1,62 @@
 // ============================================================
-//  src/bot.js  —  WhatsApp client entry point
-//  Run:  node src/bot.js
+//  src/bot.js  —  Entry point. Clean, no dead code.
 // ============================================================
 
 const { Client, LocalAuth } = require("whatsapp-web.js");
-const qrcode               = require("qrcode-terminal");
-const { handleMessage }    = require("./flowHandler");
-const apiServer            = require("./apiServer");
+const qrcode                = require("qrcode-terminal");
+const { handleMessage }     = require("./flowHandler");
+const api                   = require("./apiServer");
 
-// Start admin REST API on port 3001
-apiServer.start();
+// Start REST API (port 3001)
+api.start();
 
-// ── WhatsApp Client Setup ────────────────────────────────────
 const client = new Client({
   authStrategy: new LocalAuth({ clientId: "appointment-bot" }),
   puppeteer: {
-    args: [
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-      "--disable-dev-shm-usage",
-    ],
+    args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
     headless: true,
   },
 });
 
-// ── QR Code (scan once with your phone) ─────────────────────
+// ── QR: send to terminal AND to React via API ────────────────
 client.on("qr", (qr) => {
-  console.log("\n┌─────────────────────────────────────────┐");
-  console.log("│  📱  Scan this QR code with WhatsApp    │");
-  console.log("└─────────────────────────────────────────┘\n");
+  console.log("\n📱  Scan QR with WhatsApp (or see it in the Admin Dashboard):\n");
   qrcode.generate(qr, { small: true });
+  api.setQR(qr);   // ← React dashboard will poll this
 });
 
-// ── Bot is ready ─────────────────────────────────────────────
+// ── Ready ────────────────────────────────────────────────────
 client.on("ready", () => {
-  console.log("\n✅  Appointment Bot is LIVE!\n");
-  console.log("📌  Businesses configured:");
+  api.setConnected();
+  console.log("\n✅  Bot is LIVE!");
   const businesses = require("../data/businesses");
-  businesses.forEach((b) => console.log(`    • ${b.name} (${b.category})`));
-  console.log("\n💬  Send 'hi' from any WhatsApp number to start.\n");
+  businesses.forEach(b => console.log(`   • ${b.name}`));
+  console.log("\n💬  Send 'hi' from any WhatsApp to start.\n");
 });
 
-// ── Incoming message handler ─────────────────────────────────
+// ── Incoming messages ────────────────────────────────────────
 client.on("message", async (msg) => {
-  // Ignore group messages, status updates, and non-text
-  if (msg.isGroupMsg)                    return;
-  if (msg.from === "status@broadcast")   return;
-  if (msg.type !== "chat")               return;
+  if (msg.isGroupMsg)                  return;
+  if (msg.from === "status@broadcast") return;
+  if (msg.type !== "chat")             return;
 
-  const phone = msg.from;          // e.g. "919876543210@c.us"
-  const text  = msg.body?.trim();
+  const text = msg.body?.trim();
   if (!text) return;
 
-  console.log(`📨  [${new Date().toLocaleTimeString()}] ${phone}: ${text}`);
+  console.log(`📨  [${new Date().toLocaleTimeString()}] ${msg.from}: ${text}`);
 
   try {
-    const reply = await handleMessage(phone, text);
-    if (reply) {
-      await msg.reply(reply);
-      console.log(`📤  Replied to ${phone}`);
-    }
+    const reply = await handleMessage(msg.from, text);
+    if (reply) await msg.reply(reply);
   } catch (err) {
-    console.error("❌ Error handling message:", err);
-    await msg.reply("⚠️ Something went wrong. Please send *hi* to start again.");
+    console.error("❌", err.message);
+    await msg.reply("⚠️ Error. Send *hi* to restart.");
   }
 });
 
-// ── Auth events ──────────────────────────────────────────────
-client.on("authenticated", () => console.log("🔐  WhatsApp authenticated!"));
-client.on("auth_failure",  () => console.error("❌  Auth failed. Delete .wwebjs_auth folder and retry."));
-client.on("disconnected",  (r) => console.log("📵  Disconnected:", r));
+// ── Auth / connection events ─────────────────────────────────
+client.on("authenticated",  ()  => console.log("🔐  Authenticated!"));
+client.on("auth_failure",   ()  => console.error("❌  Auth failed. Delete .wwebjs_auth and retry."));
+client.on("disconnected",   (r) => { api.setDisconnected(); console.log("📵  Disconnected:", r); });
 
-// ── Start ────────────────────────────────────────────────────
 client.initialize();
