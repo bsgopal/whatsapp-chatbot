@@ -1,0 +1,19 @@
+{
+  "name": "whatsapp-appointment-bot",
+  "version": "1.0.0",
+  "description": "WhatsApp chatbot for booking appointments across multiple businesses",
+  "main": "src/bot.js",
+  "scripts": {
+    "start": "node src/bot.js",
+    "dev": "nodemon src/bot.js"
+  },
+  "dependencies": {
+    "whatsapp-web.js": "^1.23.0",
+    "qrcode-terminal": "^0.12.0",
+    "moment": "^2.29.4",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  }
+}

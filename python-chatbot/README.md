@@ -1,124 +1,144 @@
-# WA Appt OS Python Chatbot
+# 📱 WhatsApp Appointment Booking Bot
 
-An AI-powered WhatsApp chatbot for appointment booking built with FastAPI and OpenAI GPT.
+A free WhatsApp chatbot built with `whatsapp-web.js` that lets users book, cancel, and reschedule appointments across multiple businesses (clinics, salons, gyms, etc.)
 
-## Features
+---
 
-- 🤖 **AI-Powered Conversations**: Uses OpenAI GPT for natural language understanding and responses
-- 📅 **Appointment Booking**: Complete booking flow with service selection, date/time picking, and confirmation
-- 💬 **Interactive Messages**: WhatsApp interactive buttons and lists for better UX
-- 🧠 **Intent Recognition**: AI analyzes user messages to understand intent and extract entities
-- 📊 **Business Logic**: Handles availability checking, business hours, and booking conflicts
-- 🔄 **State Management**: Maintains conversation state across messages
-- 🌐 **REST API**: FastAPI-based REST endpoint for integration
+## 🗂️ Project Structure
 
-## Setup
-
-1. **Install Dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-2. **Configure OpenAI API**:
-   - Copy `.env` file and add your OpenAI API key:
-   ```
-   OPENAI_API_KEY=your_actual_api_key_here
-   ```
-
-3. **Run the Server**:
-   ```bash
-   # Development
-   python -m uvicorn app:app --reload --host 127.0.0.1 --port 8001
-
-   # Production
-   uvicorn app:app --host 0.0.0.0 --port 8001
-   ```
-
-## API Usage
-
-### Health Check
-```bash
-GET /health
+```
+whatsapp-appointment-bot/
+├── src/
+│   ├── bot.js              ← WhatsApp client (entry point)
+│   ├── flowHandler.js      ← Conversation steps & logic
+│   ├── sessionManager.js   ← Per-user session tracking
+│   ├── appointmentStore.js ← Book / cancel / reschedule
+│   └── messages.js         ← All WhatsApp message templates
+├── data/
+│   └── businesses.js       ← Your businesses config
+├── package.json
+└── README.md
 ```
 
-### Process Message
-```bash
-POST /reply
-Content-Type: application/json
+---
 
+## ⚙️ Setup & Run
+
+### 1. Install Node.js
+Download from https://nodejs.org (v16 or higher)
+
+### 2. Install dependencies
+```bash
+cd whatsapp-appointment-bot
+npm install
+```
+
+### 3. Start the bot
+```bash
+node src/bot.js
+```
+
+### 4. Scan QR Code
+- A QR code appears in your terminal
+- Open WhatsApp on your phone → Linked Devices → Link a Device
+- Scan the QR code
+- ✅ Bot is now live!
+
+> After first scan, the session is saved — no need to scan again on restart.
+
+---
+
+## 💬 How it Works (Full Conversation Flow)
+
+```
+User sends "hi"
+        ↓
+[MAIN MENU]
+  1️⃣ Book Appointment
+  2️⃣ View My Appointments
+  3️⃣ Cancel Appointment
+  4️⃣ Reschedule Appointment
+
+── BOOKING FLOW ──────────────────────────────
+  → Choose Business (Clinic / Salon / Gym)
+  → Choose Staff / Doctor / Stylist
+  → Choose Date (next 7 available working days)
+  → Choose Time Slot (booked slots marked ❌)
+  → Enter Your Name
+  → ✅ Confirmed! (Booking ID shown)
+
+── CANCEL FLOW ───────────────────────────────
+  → Lists your active appointments
+  → Choose which to cancel
+  → ✅ Cancelled!
+
+── RESCHEDULE FLOW ───────────────────────────
+  → Lists your active appointments
+  → Choose which to reschedule
+  → Pick new date → Pick new slot
+  → ✅ Rescheduled!
+
+At any point: reply "0" to go back to main menu
+```
+
+---
+
+## 🏢 Adding Your Own Businesses
+
+Edit `data/businesses.js`:
+
+```js
 {
-  "business": {
-    "name": "My Business",
-    "currency": "INR",
-    "businessHours": [...],
-    "botSettings": {
-      "welcomeMessage": "Welcome to our service!"
-    }
-  },
-  "contact": {
-    "name": "John Doe",
-    "botState": {
-      "stage": "awaiting_service"
-    }
-  },
-  "incomingText": "I want to book an appointment",
-  "services": [
-    {
-      "_id": "service1",
-      "name": "Hair Cut",
-      "price": 500,
-      "duration": 60
-    }
+  id: "dental",                      // unique ID
+  name: "🦷 Bright Smile Dental",
+  category: "Dentist",
+  staff: [
+    { id: "dr_ali", name: "Dr. Ali", role: "Orthodontist" },
   ],
-  "existingAppointments": [],
-  "currentTime": "2024-01-01T10:00:00Z"
+  workingDays: ["Monday","Tuesday","Wednesday","Thursday","Friday"],
+  slots: ["09:00 AM","10:00 AM","11:00 AM","02:00 PM","03:00 PM"],
+  slotDuration: 30,
 }
 ```
 
-## Conversation Flow
+---
 
-1. **Greeting/Reset**: User starts conversation or says "menu"
-2. **Service Selection**: User chooses from available services
-3. **Date Selection**: User picks preferred date
-4. **Time Selection**: User selects available time slot
-5. **Confirmation**: User confirms booking details
-6. **Completion**: Booking is created and confirmed
+## 🔒 Multi-User Support
 
-## AI Features
+- Every WhatsApp number gets its **own independent session**
+- Sessions auto-expire after **10 minutes of inactivity**
+- Double-booking prevention: same staff + date + slot can't be booked twice
+- Send `0` at any step to reset to the main menu
 
-- **Intent Analysis**: Detects user intentions (book, cancel, get info, etc.)
-- **Entity Extraction**: Pulls dates, times, and service names from messages
-- **Natural Responses**: Generates contextual, friendly replies
-- **Fallback Handling**: Graceful degradation when AI is unavailable
-- **Conversation Memory**: Maintains context across messages
+---
 
-## Docker Deployment
+## 🗄️ Using a Real Database (Production)
 
-```bash
-# Build image
-docker build -t wa-chatbot .
+The `appointmentStore.js` uses in-memory storage by default.
+For production, replace the store functions with a real DB:
 
-# Run container
-docker run -p 8001:8001 --env-file .env wa-chatbot
-```
+| Database   | Package          |
+|------------|------------------|
+| SQLite     | `better-sqlite3` |
+| MongoDB    | `mongoose`       |
+| PostgreSQL | `pg`             |
+| MySQL      | `mysql2`         |
 
-## Environment Variables
+---
 
-- `OPENAI_API_KEY`: Your OpenAI API key (required)
-- `OPENAI_MODEL`: GPT model to use (default: gpt-3.5-turbo)
-- `OPENAI_MAX_TOKENS`: Max tokens per response (default: 200)
+## ⚠️ Important Notes
 
-## Testing
+- This uses `whatsapp-web.js` which simulates WhatsApp Web — it's **free** but requires keeping the Node process running
+- For production/high volume, consider **WhatsApp Business API** (paid, from Meta)
+- Do **not** use for spam — follow WhatsApp's Terms of Service
 
-The chatbot includes comprehensive validation:
-- Business hours checking
-- Appointment availability
-- Input validation
-- State management
-- Error handling
+---
 
-Test with various inputs like:
-- "I want to book a haircut tomorrow at 2pm"
-- "What services do you offer?"
-- "Cancel my booking"
-- "Menu" or "Start over"
+## 📞 Troubleshooting
+
+| Problem | Fix |
+|---|---|
+| QR not showing | Run `npm install` again |
+| Auth keeps failing | Delete `.wwebjs_auth/` folder |
+| Messages not received | Make sure phone stays connected |
+| Puppeteer errors on Linux | Install: `apt-get install -y chromium-browser` |

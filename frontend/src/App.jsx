@@ -12,6 +12,7 @@ import Analytics from './components/analytics/Analytics';
 import Staff from './components/staff/Staff';
 import Services from './components/services/Services';
 import Settings from './components/settings/Settings';
+import AdminDashboard from "./components/Admindashboard";
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated } = useAuthStore();
@@ -47,6 +48,7 @@ export default function App() {
           <Route path="staff" element={<Staff />} />
           <Route path="services" element={<Services />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="admin" element={<AdminDashboard />} />
         </Route>
       </Routes>
     </BrowserRouter>
