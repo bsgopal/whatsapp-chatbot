@@ -1,0 +1,39 @@
+# ── Dependencies ────────────────────────────────────
+node_modules/
+frontend/node_modules/
+backend/node_modules/
+python-chatbot/node_modules/
+
+# ── Vite cache ───────────────────────────────────────
+frontend/node_modules/.vite/
+frontend/dist/
+
+# ── Python ───────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# ── WhatsApp session (sensitive!) ────────────────────
+python-chatbot/.wwebjs_auth/
+python-chatbot/.wwebjs_cache/
+
+# ── Logs ─────────────────────────────────────────────
+logs/
+*.log
+backend/logs/
+
+# ── Environment variables (keep .env.example) ────────
+# .env   <-- keep commented so your .env IS tracked (it has tokens)
+# If you want to untrack: uncomment the line below
+# .env
+
+# ── OS files ─────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Editor ───────────────────────────────────────────
+.vscode/settings.json
+.idea/
