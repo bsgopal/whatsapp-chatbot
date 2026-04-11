@@ -10,6 +10,22 @@ const sessionManager = require("./sessionManager");
 const api = require("./apiServer");
 const { exposeFunctionIfAbsent } = require("whatsapp-web.js/src/util/Puppeteer");
 
+const BOT_SYNC_URL = process.env.BACKEND_URL || 'http://localhost:5000';
+const BOT_SYNC_SECRET = process.env.BOT_SYNC_SECRET || 'wa_bot_sync_secret_2024';
+
+async function syncToMongo(endpoint, body) {
+  try {
+    const http = require('http');
+    // simple fire-and-forget POST
+    const data = JSON.stringify(body);
+    const url = new URL(BOT_SYNC_URL + '/api/v1/bot-sync/' + endpoint);
+    const options = { hostname: url.hostname, port: url.port || 5000, path: url.pathname, method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data), 'x-bot-secret': BOT_SYNC_SECRET } };
+    const req = http.request(options);
+    req.write(data);
+    req.end();
+  } catch(e) { console.warn('[sync] failed:', e.message); }
+}
+
 const AUTH_CLIENT_ID = "appointment-bot";
 const AUTH_DATA_PATH = path.resolve(__dirname, "..", ".wwebjs_auth");
 const LEGACY_SESSION_PATHS = [
@@ -244,6 +260,8 @@ client.on("message", async (msg) => {
   if (!text) return;
 
   console.log(`📨  [${new Date().toLocaleTimeString()}] ${msg.from}: ${text}`);
+
+  syncToMongo('contact', { phone: msg.from, businessName: 'FitZone Gym', name: null });
 
   try {
     const reply = await handleMessage(msg.from, text);

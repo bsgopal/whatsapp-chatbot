@@ -968,6 +968,9 @@ async function handleBookingBotWithPython({ app, business, contact, incomingText
       customerName: decision.create_appointment.customer_name,
     });
 
+    // Persist botState back to idle after appointment is created
+    await ContactModel.findByIdAndUpdate(contact._id, updates);
+
     await replyToContact({
       app,
       business,
@@ -1407,6 +1410,238 @@ webhookRouter.post('/whatsapp', async (req, res) => {
   }
 });
 
+// botSync.js — Sync appointments and contacts from Python bot
+const botSyncRouter = express.Router();
+
+// Middleware to verify bot secret
+botSyncRouter.use((req, res, next) => {
+  const secret = req.headers['x-bot-secret'];
+  if (secret !== process.env.BOT_SYNC_SECRET) {
+    return res.status(401).json({ success: false, message: 'Invalid bot secret' });
+  }
+  next();
+});
+
+botSyncRouter.post('/appointment', async (req, res) => {
+  try {
+    const { action, phone, name, businessName, staffName, serviceName, servicePrice, serviceDuration, date, slot, bookingId } = req.body;
+
+    // Find business by name
+    const business = await Business.findOne({ name: businessName });
+    if (!business) return res.status(404).json({ success: false, message: 'Business not found' });
+
+    // Find or create contact
+    let contact = await ContactModel.findOne({ business: business._id, phone });
+    if (!contact) {
+      contact = await ContactModel.create({
+        business: business._id,
+        phone,
+        name: name || null,
+        source: 'whatsapp_bot',
+      });
+    }
+
+    if (action === 'book') {
+      // Create appointment
+      const appointment = await Appointment.create({
+        business: business._id,
+        contact: contact._id,
+        service: serviceName, // Note: using name, may need to resolve to ID
+        staff: staffName,
+        date,
+        time: slot,
+        status: 'confirmed',
+        price: servicePrice,
+        duration: serviceDuration,
+        notes: `Booked via WhatsApp bot - ID: ${bookingId}`,
+        source: 'whatsapp_bot',
+      });
+
+      // Emit socket event
+      const io = req.app.get('io');
+      if (io) io.to(`business_${business._id}`).emit('new_appointment', appointment);
+
+      res.json({ success: true, appointment: appointment._id });
+    } else if (action === 'cancel') {
+      const appointment = await Appointment.findOneAndUpdate(
+        { business: business._id, contact: contact._id, status: 'confirmed' },
+        { status: 'cancelled', cancelledAt: new Date() },
+        { new: true }
+      );
+      if (!appointment) return res.status(404).json({ success: false, message: 'Appointment not found' });
+
+      const io = req.app.get('io');
+      if (io) io.to(`business_${business._id}`).emit('appointment_updated', appointment);
+
+      res.json({ success: true });
+    } else if (action === 'reschedule') {
+      const { newDate, newSlot } = req.body;
+      const appointment = await Appointment.findOneAndUpdate(
+        { business: business._id, contact: contact._id, status: 'confirmed' },
+        { date: newDate, time: newSlot, rescheduledAt: new Date() },
+        { new: true }
+      );
+      if (!appointment) return res.status(404).json({ success: false, message: 'Appointment not found' });
+
+      const io = req.app.get('io');
+      if (io) io.to(`business_${business._id}`).emit('appointment_updated', appointment);
+
+      res.json({ success: true });
+    } else {
+      res.status(400).json({ success: false, message: 'Invalid action' });
+    }
+  } catch (err) {
+    console.error('Bot sync appointment error:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+botSyncRouter.post('/contact', async (req, res) => {
+  try {
+    const { phone, businessName, name } = req.body;
+
+    const business = await Business.findOne({ name: businessName });
+    if (!business) return res.status(404).json({ success: false, message: 'Business not found' });
+
+    let contact = await ContactModel.findOne({ business: business._id, phone });
+    if (!contact) {
+      contact = await ContactModel.create({
+        business: business._id,
+        phone,
+        name: name || null,
+        source: 'whatsapp_bot',
+        lastMessageAt: new Date(),
+      });
+    } else {
+      await ContactModel.findByIdAndUpdate(contact._id, {
+        lastMessageAt: new Date(),
+        $inc: { totalMessages: 1 },
+      });
+    }
+
+    res.json({ success: true, contact: contact._id });
+  } catch (err) {
+    console.error('Bot sync contact error:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// botSync.js — Sync appointments and contacts from Python bot
+const botSyncRouter = express.Router();
+
+// Middleware to verify bot secret
+botSyncRouter.use((req, res, next) => {
+  const secret = req.headers['x-bot-secret'];
+  if (secret !== process.env.BOT_SYNC_SECRET) {
+    return res.status(401).json({ success: false, message: 'Invalid bot secret' });
+  }
+  next();
+});
+
+botSyncRouter.post('/appointment', async (req, res) => {
+  try {
+    const { action, phone, name, businessName, staffName, serviceName, servicePrice, serviceDuration, date, slot, bookingId } = req.body;
+
+    // Find business by name
+    const business = await Business.findOne({ name: businessName });
+    if (!business) return res.status(404).json({ success: false, message: 'Business not found' });
+
+    // Find or create contact
+    let contact = await ContactModel.findOne({ business: business._id, phone });
+    if (!contact) {
+      contact = await ContactModel.create({
+        business: business._id,
+        phone,
+        name: name || null,
+        source: 'whatsapp_bot',
+      });
+    }
+
+    if (action === 'book') {
+      // Create appointment
+      const appointment = await Appointment.create({
+        business: business._id,
+        contact: contact._id,
+        service: serviceName, // Note: using name, may need to resolve to ID
+        staff: staffName,
+        date,
+        time: slot,
+        status: 'confirmed',
+        price: servicePrice,
+        duration: serviceDuration,
+        notes: `Booked via WhatsApp bot - ID: ${bookingId}`,
+        source: 'whatsapp_bot',
+      });
+
+      // Emit socket event
+      const io = req.app.get('io');
+      if (io) io.to(`business_${business._id}`).emit('new_appointment', appointment);
+
+      res.json({ success: true, appointment: appointment._id });
+    } else if (action === 'cancel') {
+      const appointment = await Appointment.findOneAndUpdate(
+        { business: business._id, contact: contact._id, status: 'confirmed' },
+        { status: 'cancelled', cancelledAt: new Date() },
+        { new: true }
+      );
+      if (!appointment) return res.status(404).json({ success: false, message: 'Appointment not found' });
+
+      const io = req.app.get('io');
+      if (io) io.to(`business_${business._id}`).emit('appointment_updated', appointment);
+
+      res.json({ success: true });
+    } else if (action === 'reschedule') {
+      const { newDate, newSlot } = req.body;
+      const appointment = await Appointment.findOneAndUpdate(
+        { business: business._id, contact: contact._id, status: 'confirmed' },
+        { date: newDate, time: newSlot, rescheduledAt: new Date() },
+        { new: true }
+      );
+      if (!appointment) return res.status(404).json({ success: false, message: 'Appointment not found' });
+
+      const io = req.app.get('io');
+      if (io) io.to(`business_${business._id}`).emit('appointment_updated', appointment);
+
+      res.json({ success: true });
+    } else {
+      res.status(400).json({ success: false, message: 'Invalid action' });
+    }
+  } catch (err) {
+    console.error('Bot sync appointment error:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+botSyncRouter.post('/contact', async (req, res) => {
+  try {
+    const { phone, businessName, name } = req.body;
+
+    const business = await Business.findOne({ name: businessName });
+    if (!business) return res.status(404).json({ success: false, message: 'Business not found' });
+
+    let contact = await ContactModel.findOne({ business: business._id, phone });
+    if (!contact) {
+      contact = await ContactModel.create({
+        business: business._id,
+        phone,
+        name: name || null,
+        source: 'whatsapp_bot',
+        lastMessageAt: new Date(),
+      });
+    } else {
+      await ContactModel.findByIdAndUpdate(contact._id, {
+        lastMessageAt: new Date(),
+        $inc: { totalMessages: 1 },
+      });
+    }
+
+    res.json({ success: true, contact: contact._id });
+  } catch (err) {
+    console.error('Bot sync contact error:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 module.exports = {
   staffRouter,
   serviceRouter,
@@ -1414,4 +1649,5 @@ module.exports = {
   chatRouter,
   notifRouter,
   webhookRouter,
+  botSyncRouter,
 };

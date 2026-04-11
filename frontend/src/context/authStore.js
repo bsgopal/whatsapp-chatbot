@@ -74,7 +74,7 @@ const useAuthStore = create((set, get) => ({
     set({ user: null, business: null, token: null, isAuthenticated: false });
   },
 
-  updateBusiness: (business) => set({ business }),
+  updateBusiness: (business) => set({ business: business ? { ...business, id: business.id || business._id } : null }),
 }));
 
 export default useAuthStore;

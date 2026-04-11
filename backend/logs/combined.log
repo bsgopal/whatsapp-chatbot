@@ -285,3 +285,196 @@
 {"level":"info","message":"🚀 WA Appt OS Server running on port 5001 [development]","timestamp":"2026-04-11 15:48:13"}
 {"level":"info","message":"📡 Socket.IO ready","timestamp":"2026-04-11 15:48:13"}
 {"level":"info","message":"Socket connected: gdJHnlUPTZVUYjisAAAB","timestamp":"2026-04-11 15:48:14"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2026-04-11 15:48:16"}
+{"level":"info","message":"🚀 WA Appt OS Server running on port 5001 [development]","timestamp":"2026-04-11 15:48:16"}
+{"level":"info","message":"📡 Socket.IO ready","timestamp":"2026-04-11 15:48:16"}
+{"level":"info","message":"Socket connected: J0L5k0B9Yuemb_poAAAB","timestamp":"2026-04-11 15:48:19"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:18:42 +0000] \"GET /api/v1/contacts?search=&page=1&limit=20 HTTP/1.1\" 304 - \"http://localhost:3000/contacts\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:48:42"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:18:42 +0000] \"GET /api/v1/notifications?limit=10 HTTP/1.1\" 304 - \"http://localhost:3000/contacts\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:48:42"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:18:42 +0000] \"GET /api/v1/auth/me HTTP/1.1\" 200 799 \"http://localhost:3000/contacts\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:48:42"}
+{"level":"info","message":"Socket connected: R5u93oamGvo1GQQCAAAD","timestamp":"2026-04-11 15:48:42"}
+{"level":"info","message":"Socket R5u93oamGvo1GQQCAAAD joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 15:48:42"}
+{"level":"info","message":"Socket disconnected: R5u93oamGvo1GQQCAAAD","timestamp":"2026-04-11 15:48:48"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:18:48 +0000] \"GET /api/v1/auth/me HTTP/1.1\" 200 799 \"http://localhost:3000/contacts\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:48:48"}
+{"level":"info","message":"Socket connected: 6DFqeufDpCqI5K-8AAAF","timestamp":"2026-04-11 15:48:48"}
+{"level":"info","message":"Socket 6DFqeufDpCqI5K-8AAAF joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 15:48:48"}
+{"level":"info","message":"Socket disconnected: J0L5k0B9Yuemb_poAAAB","timestamp":"2026-04-11 15:50:00"}
+{"level":"info","message":"Socket disconnected: 6DFqeufDpCqI5K-8AAAF","timestamp":"2026-04-11 15:50:00"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:00 +0000] \"GET /api/v1/contacts?search=&page=1&limit=20 HTTP/1.1\" 304 - \"http://localhost:3000/contacts\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:00"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:00 +0000] \"GET /api/v1/notifications?limit=10 HTTP/1.1\" 304 - \"http://localhost:3000/contacts\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:00"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:00 +0000] \"GET /api/v1/auth/me HTTP/1.1\" 200 799 \"http://localhost:3000/contacts\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:00"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:00 +0000] \"GET /api/v1/auth/me HTTP/1.1\" 304 - \"http://localhost:3000/contacts\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:00"}
+{"level":"info","message":"Socket connected: cf9KsK8k91m5AkesAAAH","timestamp":"2026-04-11 15:50:00"}
+{"level":"info","message":"Socket cf9KsK8k91m5AkesAAAH joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 15:50:00"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:02 +0000] \"GET /api/v1/settings HTTP/1.1\" 304 - \"http://localhost:3000/settings\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:02"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:02 +0000] \"GET /api/v1/staff HTTP/1.1\" 304 - \"http://localhost:3000/settings\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:02"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:02 +0000] \"GET /api/v1/services HTTP/1.1\" 304 - \"http://localhost:3000/settings\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:02"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:02 +0000] \"GET /api/v1/settings/bot-preview HTTP/1.1\" 304 - \"http://localhost:3000/settings\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:02"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:14 +0000] \"GET /api/v1/appointments/today HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:14"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:14 +0000] \"GET /api/v1/analytics/dashboard HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:14"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:14 +0000] \"GET /api/v1/analytics/chatbot?period=30d HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:14"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:15 +0000] \"GET /api/v1/appointments?status=&page=1 HTTP/1.1\" 304 - \"http://localhost:3000/appointments\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:15"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:15 +0000] \"GET /api/v1/contacts?limit=200 HTTP/1.1\" 304 - \"http://localhost:3000/appointments\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:15"}
+{"level":"info","message":"Socket connected: mFJg48mCAa5OLuAqAAAK","timestamp":"2026-04-11 15:50:15"}
+{"level":"info","message":"Socket mFJg48mCAa5OLuAqAAAK joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 15:50:15"}
+{"level":"info","message":"Socket disconnected: mFJg48mCAa5OLuAqAAAK","timestamp":"2026-04-11 15:50:16"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:17 +0000] \"GET /api/v1/chat/conversations HTTP/1.1\" 304 - \"http://localhost:3000/chat\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:17"}
+{"level":"info","message":"Socket connected: 10hcwOgTonIYgCL3AAAN","timestamp":"2026-04-11 15:50:17"}
+{"level":"info","message":"Socket 10hcwOgTonIYgCL3AAAN joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 15:50:17"}
+{"level":"info","message":"Socket disconnected: 10hcwOgTonIYgCL3AAAN","timestamp":"2026-04-11 15:50:18"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:18 +0000] \"GET /api/v1/analytics/revenue?period=30d HTTP/1.1\" 304 - \"http://localhost:3000/analytics\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:18"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:18 +0000] \"GET /api/v1/analytics/chatbot?period=30d HTTP/1.1\" 304 - \"http://localhost:3000/analytics\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:18"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:21 +0000] \"GET /api/qr-status HTTP/1.1\" 404 152 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:21"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:21 +0000] \"GET /api/appointments HTTP/1.1\" 404 155 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:21"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:21 +0000] \"GET /api/stats HTTP/1.1\" 404 148 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:21"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:21 +0000] \"GET /api/qr-status HTTP/1.1\" 404 152 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:21"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:21 +0000] \"GET /api/appointments HTTP/1.1\" 404 155 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:21"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:21 +0000] \"GET /api/stats HTTP/1.1\" 404 148 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:21"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:24 +0000] \"GET /api/qr-status HTTP/1.1\" 404 152 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:24"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:27 +0000] \"GET /api/qr-status HTTP/1.1\" 404 152 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:27"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:30 +0000] \"GET /api/qr-status HTTP/1.1\" 404 152 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:30"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:30 +0000] \"GET /api/v1/notifications?limit=10 HTTP/1.1\" 304 - \"http://localhost:3000/admin\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:30"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:33 +0000] \"GET /api/qr-status HTTP/1.1\" 404 152 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:33"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:37 +0000] \"POST /api/logout HTTP/1.1\" 404 150 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:37"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:37 +0000] \"GET /api/qr-status HTTP/1.1\" 404 152 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:37"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:37 +0000] \"GET /api/appointments HTTP/1.1\" 404 155 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:37"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:37 +0000] \"GET /api/stats HTTP/1.1\" 404 148 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:37"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:39 +0000] \"GET /api/qr-status HTTP/1.1\" 404 152 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:39"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:42 +0000] \"GET /api/qr-status HTTP/1.1\" 404 152 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:42"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:46 +0000] \"GET /api/qr-status HTTP/1.1\" 404 152 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:46"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:57 +0000] \"GET /api/v1/services HTTP/1.1\" 304 - \"http://localhost:3000/services\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:57"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:58 +0000] \"GET /api/v1/analytics/revenue?period=30d HTTP/1.1\" 304 - \"http://localhost:3000/analytics\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:58"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:58 +0000] \"GET /api/v1/analytics/chatbot?period=30d HTTP/1.1\" 304 - \"http://localhost:3000/analytics\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:58"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:58 +0000] \"GET /api/v1/analytics/dashboard HTTP/1.1\" 304 - \"http://localhost:3000/analytics\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:58"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:20:59 +0000] \"GET /api/v1/chat/conversations HTTP/1.1\" 304 - \"http://localhost:3000/chat\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:50:59"}
+{"level":"info","message":"Socket connected: ZND8CwcwKT8KChaVAAAQ","timestamp":"2026-04-11 15:50:59"}
+{"level":"info","message":"Socket ZND8CwcwKT8KChaVAAAQ joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 15:50:59"}
+{"level":"info","message":"Socket disconnected: ZND8CwcwKT8KChaVAAAQ","timestamp":"2026-04-11 15:51:00"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:21:00 +0000] \"GET /api/v1/contacts?search=&page=1&limit=20 HTTP/1.1\" 304 - \"http://localhost:3000/contacts\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:51:00"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:21:00 +0000] \"GET /api/v1/notifications?limit=10 HTTP/1.1\" 304 - \"http://localhost:3000/contacts\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:51:00"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2026-04-11 15:57:48"}
+{"level":"info","message":"🚀 WA Appt OS Server running on port 5001 [development]","timestamp":"2026-04-11 15:57:48"}
+{"level":"info","message":"📡 Socket.IO ready","timestamp":"2026-04-11 15:57:48"}
+{"level":"info","message":"Socket connected: S-APbeQEhwB-PuYZAAAB","timestamp":"2026-04-11 15:57:51"}
+{"level":"info","message":"Socket connected: YLYwL214VooQbpc1AAAE","timestamp":"2026-04-11 15:58:13"}
+{"level":"info","message":"Socket YLYwL214VooQbpc1AAAE joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 15:58:13"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:28:13 +0000] \"GET /api/v1/contacts?search=&page=1&limit=20 HTTP/1.1\" 304 - \"http://localhost:3000/contacts\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:58:13"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:28:19 +0000] \"GET /api/v1/notifications?limit=10 HTTP/1.1\" 304 - \"http://localhost:3000/contacts\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:58:19"}
+{"level":"info","message":"Socket disconnected: S-APbeQEhwB-PuYZAAAB","timestamp":"2026-04-11 15:58:20"}
+{"level":"info","message":"Socket disconnected: YLYwL214VooQbpc1AAAE","timestamp":"2026-04-11 15:58:20"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:28:20 +0000] \"GET /api/v1/contacts?search=&page=1&limit=20 HTTP/1.1\" 304 - \"http://localhost:3000/contacts\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:58:20"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:28:20 +0000] \"GET /api/v1/notifications?limit=10 HTTP/1.1\" 304 - \"http://localhost:3000/contacts\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:58:20"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:28:20 +0000] \"GET /api/v1/auth/me HTTP/1.1\" 200 799 \"http://localhost:3000/contacts\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:58:20"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:28:20 +0000] \"GET /api/v1/auth/me HTTP/1.1\" 304 - \"http://localhost:3000/contacts\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:58:20"}
+{"level":"info","message":"Socket connected: Oj_lKVNnzCIvKGMjAAAG","timestamp":"2026-04-11 15:58:20"}
+{"level":"info","message":"Socket connected: WHD1cwnUtowYMLifAAAI","timestamp":"2026-04-11 15:58:20"}
+{"level":"info","message":"Socket WHD1cwnUtowYMLifAAAI joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 15:58:20"}
+{"level":"info","message":"Socket WHD1cwnUtowYMLifAAAI joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 15:58:20"}
+{"level":"info","message":"Socket disconnected: WHD1cwnUtowYMLifAAAI","timestamp":"2026-04-11 15:58:22"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:28:22 +0000] \"GET /api/v1/staff HTTP/1.1\" 304 - \"http://localhost:3000/appointments\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:58:22"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:28:22 +0000] \"GET /api/v1/services HTTP/1.1\" 304 - \"http://localhost:3000/appointments\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:58:22"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:28:22 +0000] \"GET /api/v1/appointments?status=&page=1 HTTP/1.1\" 304 - \"http://localhost:3000/appointments\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:58:22"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:28:22 +0000] \"GET /api/v1/contacts?limit=200 HTTP/1.1\" 304 - \"http://localhost:3000/appointments\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:58:22"}
+{"level":"info","message":"Socket connected: 2Bd6t-SxRfFQiRl_AAAL","timestamp":"2026-04-11 15:58:22"}
+{"level":"info","message":"Socket 2Bd6t-SxRfFQiRl_AAAL joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 15:58:22"}
+{"level":"info","message":"Socket disconnected: 2Bd6t-SxRfFQiRl_AAAL","timestamp":"2026-04-11 15:58:23"}
+{"level":"info","message":"Socket connected: A0TLwL6OXQbx99ryAAAO","timestamp":"2026-04-11 15:58:23"}
+{"level":"info","message":"Socket A0TLwL6OXQbx99ryAAAO joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 15:58:23"}
+{"level":"info","message":"Socket disconnected: A0TLwL6OXQbx99ryAAAO","timestamp":"2026-04-11 15:58:24"}
+{"level":"info","message":"Socket connected: W0CfPxqbZn5vGBaOAAAR","timestamp":"2026-04-11 15:58:24"}
+{"level":"info","message":"Socket W0CfPxqbZn5vGBaOAAAR joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 15:58:24"}
+{"level":"info","message":"Socket disconnected: W0CfPxqbZn5vGBaOAAAR","timestamp":"2026-04-11 15:58:26"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:28:26 +0000] \"GET /api/v1/appointments/today HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:58:26"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:28:26 +0000] \"GET /api/v1/analytics/dashboard HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:58:26"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:28:26 +0000] \"GET /api/v1/analytics/chatbot?period=30d HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:58:26"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:28:26 +0000] \"GET /api/v1/chat/conversations HTTP/1.1\" 304 - \"http://localhost:3000/chat\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:58:26"}
+{"level":"info","message":"Socket connected: ztoQ3rKNo84p3xnuAAAU","timestamp":"2026-04-11 15:58:26"}
+{"level":"info","message":"Socket ztoQ3rKNo84p3xnuAAAU joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 15:58:26"}
+{"level":"info","message":"Socket disconnected: ztoQ3rKNo84p3xnuAAAU","timestamp":"2026-04-11 15:58:27"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:28:27 +0000] \"GET /api/v1/analytics/revenue?period=30d HTTP/1.1\" 304 - \"http://localhost:3000/analytics\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:58:27"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:28:27 +0000] \"GET /api/v1/analytics/chatbot?period=30d HTTP/1.1\" 304 - \"http://localhost:3000/analytics\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 15:58:27"}
+{"level":"info","message":"Socket connected: 4dtohqIGWhTh_I-1AAAW","timestamp":"2026-04-11 15:58:28"}
+{"level":"info","message":"Socket 4dtohqIGWhTh_I-1AAAW joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 15:58:28"}
+{"level":"info","message":"Socket disconnected: 4dtohqIGWhTh_I-1AAAW","timestamp":"2026-04-11 15:58:29"}
+{"level":"info","message":"Socket connected: TTfRIBxaK5NbaoRdAAAZ","timestamp":"2026-04-11 15:58:29"}
+{"level":"info","message":"Socket TTfRIBxaK5NbaoRdAAAZ joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 15:58:29"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:30:25 +0000] \"GET /api/v1/chat/conversations HTTP/1.1\" 304 - \"http://localhost:3000/chat\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 16:00:25"}
+{"level":"info","message":"Socket disconnected: TTfRIBxaK5NbaoRdAAAZ","timestamp":"2026-04-11 16:04:08"}
+{"level":"info","message":"Socket connected: wfZSnD2uBuJpv-v7AAAc","timestamp":"2026-04-11 16:04:08"}
+{"level":"info","message":"Socket connected: M2Hy509CAiLdQchmAAAd","timestamp":"2026-04-11 16:04:08"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:34:08 +0000] \"GET /api/v1/chat/conversations HTTP/1.1\" 304 - \"http://localhost:3000/chat\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 16:04:08"}
+{"level":"info","message":"Socket M2Hy509CAiLdQchmAAAd joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 16:04:08"}
+{"level":"info","message":"Socket M2Hy509CAiLdQchmAAAd joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 16:04:08"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:34:08 +0000] \"GET /api/v1/notifications?limit=10 HTTP/1.1\" 304 - \"http://localhost:3000/chat\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 16:04:08"}
+{"level":"info","message":"Socket disconnected: M2Hy509CAiLdQchmAAAd","timestamp":"2026-04-11 16:04:36"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:34:36 +0000] \"GET /api/v1/auth/me HTTP/1.1\" 200 799 \"http://localhost:3000/chat\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 16:04:36"}
+{"level":"info","message":"Socket connected: CmnZ_HZocQ4SDWKcAAAf","timestamp":"2026-04-11 16:04:36"}
+{"level":"info","message":"Socket connected: aT6TxPjc18um3YbGAAAh","timestamp":"2026-04-11 16:04:36"}
+{"level":"info","message":"Socket aT6TxPjc18um3YbGAAAh joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 16:04:36"}
+{"level":"info","message":"Socket aT6TxPjc18um3YbGAAAh joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 16:04:36"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2026-04-11 16:04:56"}
+{"level":"info","message":"🚀 WA Appt OS Server running on port 5001 [development]","timestamp":"2026-04-11 16:04:56"}
+{"level":"info","message":"📡 Socket.IO ready","timestamp":"2026-04-11 16:04:56"}
+{"level":"info","message":"Socket connected: toBBt6tU4Xg9DCCPAAAB","timestamp":"2026-04-11 16:04:57"}
+{"level":"info","message":"Socket connected: czhD0qTT-MEhePgEAAAD","timestamp":"2026-04-11 16:04:58"}
+{"level":"info","message":"Socket czhD0qTT-MEhePgEAAAD joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 16:04:58"}
+{"level":"info","message":"Socket connected: R53252dG9SWJ7YwMAAAF","timestamp":"2026-04-11 16:04:58"}
+{"level":"info","message":"Socket connected: l9yr4AsT1r1-1T9WAAAH","timestamp":"2026-04-11 16:04:58"}
+{"level":"info","message":"Socket czhD0qTT-MEhePgEAAAD joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 16:04:58"}
+{"level":"info","message":"Socket disconnected: l9yr4AsT1r1-1T9WAAAH","timestamp":"2026-04-11 16:05:11"}
+{"level":"info","message":"Socket disconnected: R53252dG9SWJ7YwMAAAF","timestamp":"2026-04-11 16:05:11"}
+{"level":"info","message":"Socket disconnected: czhD0qTT-MEhePgEAAAD","timestamp":"2026-04-11 16:05:11"}
+{"level":"info","message":"Socket disconnected: toBBt6tU4Xg9DCCPAAAB","timestamp":"2026-04-11 16:05:11"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:35:12 +0000] \"GET /api/v1/chat/conversations HTTP/1.1\" 304 - \"http://localhost:3000/chat\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 16:05:12"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:35:12 +0000] \"GET /api/v1/notifications?limit=10 HTTP/1.1\" 304 - \"http://localhost:3000/chat\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 16:05:12"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:35:12 +0000] \"GET /api/v1/auth/me HTTP/1.1\" 200 799 \"http://localhost:3000/chat\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 16:05:12"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:35:12 +0000] \"GET /api/v1/auth/me HTTP/1.1\" 304 - \"http://localhost:3000/chat\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 16:05:12"}
+{"level":"info","message":"Socket connected: jD-RSIKBmO3PSLxOAAAJ","timestamp":"2026-04-11 16:05:12"}
+{"level":"info","message":"Socket connected: WAxrf8jqWJeR1V01AAAL","timestamp":"2026-04-11 16:05:12"}
+{"level":"info","message":"Socket WAxrf8jqWJeR1V01AAAL joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 16:05:12"}
+{"level":"info","message":"Socket WAxrf8jqWJeR1V01AAAL joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 16:05:12"}
+{"level":"info","message":"Socket disconnected: WAxrf8jqWJeR1V01AAAL","timestamp":"2026-04-11 16:05:14"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:35:14 +0000] \"GET /api/v1/contacts?search=&page=1&limit=20 HTTP/1.1\" 304 - \"http://localhost:3000/contacts\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 16:05:14"}
+{"level":"info","message":"Socket connected: s4xNdi4fS4RG6I-vAAAO","timestamp":"2026-04-11 16:05:14"}
+{"level":"info","message":"Socket s4xNdi4fS4RG6I-vAAAO joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 16:05:14"}
+{"level":"info","message":"Socket disconnected: s4xNdi4fS4RG6I-vAAAO","timestamp":"2026-04-11 16:05:14"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:35:14 +0000] \"GET /api/v1/staff HTTP/1.1\" 304 - \"http://localhost:3000/appointments\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 16:05:14"}
+{"level":"info","message":"Socket connected: SDyTYE_sr5zkX3AXAAAR","timestamp":"2026-04-11 16:05:14"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:35:14 +0000] \"GET /api/v1/services HTTP/1.1\" 304 - \"http://localhost:3000/appointments\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 16:05:14"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:35:14 +0000] \"GET /api/v1/appointments?status=&page=1 HTTP/1.1\" 304 - \"http://localhost:3000/appointments\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 16:05:14"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:35:15 +0000] \"GET /api/v1/contacts?limit=200 HTTP/1.1\" 304 - \"http://localhost:3000/appointments\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 16:05:15"}
+{"level":"info","message":"Socket SDyTYE_sr5zkX3AXAAAR joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 16:05:15"}
+{"level":"info","message":"Socket disconnected: SDyTYE_sr5zkX3AXAAAR","timestamp":"2026-04-11 16:05:15"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:35:15 +0000] \"GET /api/v1/appointments/today HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 16:05:15"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:35:15 +0000] \"GET /api/v1/analytics/dashboard HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 16:05:15"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:35:15 +0000] \"GET /api/v1/analytics/chatbot?period=30d HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 16:05:15"}
+{"level":"info","message":"Socket connected: 5Y-69hJQrmS3C0BpAAAT","timestamp":"2026-04-11 16:05:16"}
+{"level":"info","message":"Socket 5Y-69hJQrmS3C0BpAAAT joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 16:05:16"}
+{"level":"info","message":"Socket disconnected: 5Y-69hJQrmS3C0BpAAAT","timestamp":"2026-04-11 16:05:17"}
+{"level":"info","message":"Socket connected: JOzIGY0v-SQ0dBrDAAAW","timestamp":"2026-04-11 16:05:17"}
+{"level":"info","message":"Socket JOzIGY0v-SQ0dBrDAAAW joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 16:05:17"}
+{"level":"info","message":"Socket disconnected: JOzIGY0v-SQ0dBrDAAAW","timestamp":"2026-04-11 16:05:18"}
+{"level":"info","message":"Socket connected: R5seODyNA0yfERBuAAAZ","timestamp":"2026-04-11 16:05:18"}
+{"level":"info","message":"Socket R5seODyNA0yfERBuAAAZ joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 16:05:18"}
+{"level":"info","message":"Socket disconnected: R5seODyNA0yfERBuAAAZ","timestamp":"2026-04-11 16:05:19"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:35:19 +0000] \"GET /api/v1/analytics/revenue?period=30d HTTP/1.1\" 304 - \"http://localhost:3000/analytics\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 16:05:19"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:35:19 +0000] \"GET /api/v1/analytics/chatbot?period=30d HTTP/1.1\" 304 - \"http://localhost:3000/analytics\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 16:05:19"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:47:53 +0000] \"GET /api/v1/notifications?limit=10 HTTP/1.1\" 304 - \"http://localhost:3000/analytics\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 16:17:53"}
+{"level":"info","message":"Socket disconnected: jD-RSIKBmO3PSLxOAAAJ","timestamp":"2026-04-11 16:17:53"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:47:54 +0000] \"GET /api/v1/analytics/revenue?period=30d HTTP/1.1\" 304 - \"http://localhost:3000/analytics\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 16:17:54"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:47:54 +0000] \"GET /api/v1/analytics/chatbot?period=30d HTTP/1.1\" 304 - \"http://localhost:3000/analytics\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 16:17:54"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:47:54 +0000] \"GET /api/v1/auth/me HTTP/1.1\" 200 799 \"http://localhost:3000/analytics\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 16:17:54"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:47:54 +0000] \"GET /api/v1/analytics/dashboard HTTP/1.1\" 304 - \"http://localhost:3000/analytics\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 16:17:54"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:47:54 +0000] \"GET /api/v1/notifications?limit=10 HTTP/1.1\" 304 - \"http://localhost:3000/analytics\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 16:17:54"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:47:54 +0000] \"GET /api/v1/auth/me HTTP/1.1\" 304 - \"http://localhost:3000/analytics\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 16:17:54"}
+{"level":"info","message":"Socket connected: _-9ZxtnKG4qsQXaOAAAb","timestamp":"2026-04-11 16:17:54"}
+{"level":"info","message":"Socket _-9ZxtnKG4qsQXaOAAAb joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 16:17:54"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:47:56 +0000] \"GET /api/v1/services HTTP/1.1\" 304 - \"http://localhost:3000/appointments\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 16:17:56"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:47:56 +0000] \"GET /api/v1/staff HTTP/1.1\" 304 - \"http://localhost:3000/appointments\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 16:17:56"}
+{"level":"info","message":"Socket connected: DOETyS_KQQZ8zBQ2AAAe","timestamp":"2026-04-11 16:17:56"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:47:56 +0000] \"GET /api/v1/appointments?status=&page=1 HTTP/1.1\" 304 - \"http://localhost:3000/appointments\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 16:17:56"}
+{"level":"info","message":"Socket DOETyS_KQQZ8zBQ2AAAe joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 16:17:56"}
+{"level":"info","message":"::1 - - [11/Apr/2026:10:47:56 +0000] \"GET /api/v1/contacts?limit=200 HTTP/1.1\" 304 - \"http://localhost:3000/appointments\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","timestamp":"2026-04-11 16:17:56"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2026-04-11 16:18:36"}
+{"level":"info","message":"🚀 WA Appt OS Server running on port 5001 [development]","timestamp":"2026-04-11 16:18:36"}
+{"level":"info","message":"📡 Socket.IO ready","timestamp":"2026-04-11 16:18:36"}

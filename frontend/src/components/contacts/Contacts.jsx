@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
 import { contactsAPI } from '../../api';
+import { useSocket } from '../../hooks/useSocket';
 import toast from 'react-hot-toast';
 
 const normalizePhone = (value) => String(value || '').replace(/\D/g, '');
@@ -106,6 +107,13 @@ export default function Contacts() {
   const [search, setSearch] = useState('');
   const [modal, setModal] = useState(null); // null | 'add' | contact obj
   const [page, setPage] = useState(1);
+
+  // Real-time: refresh contacts when a new WhatsApp booking or message arrives
+  useSocket((event) => {
+    if (['new_appointment', 'whatsapp_message', 'new_message'].includes(event)) {
+      qc.invalidateQueries({ queryKey: ['contacts'] });
+    }
+  });
 
   const { data, isLoading } = useQuery({
     queryKey: ['contacts', search, page],
@@ -229,4 +237,3 @@ export default function Contacts() {
     </div>
   );
 }
-

@@ -7,6 +7,22 @@ const { v4: uuidv4 } = require("uuid");
 const storage        = require("node-persist");
 const path           = require("path");
 
+const BOT_SYNC_URL = process.env.BACKEND_URL || 'http://localhost:5000';
+const BOT_SYNC_SECRET = process.env.BOT_SYNC_SECRET || 'wa_bot_sync_secret_2024';
+
+async function syncToMongo(endpoint, body) {
+  try {
+    const http = require('http');
+    // simple fire-and-forget POST
+    const data = JSON.stringify(body);
+    const url = new URL(BOT_SYNC_URL + '/api/v1/bot-sync/' + endpoint);
+    const options = { hostname: url.hostname, port: url.port || 5000, path: url.pathname, method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data), 'x-bot-secret': BOT_SYNC_SECRET } };
+    const req = http.request(options);
+    req.write(data);
+    req.end();
+  } catch(e) { console.warn('[sync] failed:', e.message); }
+}
+
 let initialized = false;
 
 async function init() {
@@ -84,6 +100,7 @@ async function book({ phone, name, businessId, businessName, staffId, staffName,
 
   db[phone].push(appt);
   await _save(db);
+  syncToMongo('appointment', { action:'book', phone, name, businessName, staffName, serviceName, servicePrice, serviceDuration, date, slot, bookingId: appt.id });
   return { success: true, appointment: appt };
 }
 
@@ -96,6 +113,7 @@ async function cancel(phone, apptId) {
   appt.status = "cancelled";
   appt.cancelledAt = new Date().toISOString();
   await _save(db);
+  syncToMongo('appointment', { action:'cancel', phone, bookingId: apptId, businessName: appt.businessName });
   return { success: true, appointment: appt };
 }
 
@@ -123,6 +141,7 @@ async function reschedule(phone, apptId, newDate, newSlot) {
   appt.slot          = newSlot;
   appt.rescheduledAt = new Date().toISOString();
   await _save(db);
+  syncToMongo('appointment', { action:'reschedule', phone, bookingId: apptId, businessName: appt.businessName, newDate, newSlot });
   return { success: true, appointment: appt };
 }
 

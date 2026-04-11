@@ -24,6 +24,7 @@ const settingsRoutes = require('./routes/settings');
 const chatRoutes = require('./routes/chat');
 const notificationRoutes = require('./routes/notifications');
 const platformRoutes = require('./routes/platform_v2');
+const { botSyncRouter } = require('./routes/_all');
 
 const { errorHandler } = require('./middleware/errorHandler');
 const logger = require('./utils/logger');
@@ -90,6 +91,7 @@ app.use('/api/v1/settings', settingsRoutes);
 app.use('/api/v1/chat', chatRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/platform', platformRoutes);
+app.use('/api/v1/bot-sync', botSyncRouter);
 
 // Health check
 app.get('/health', (req, res) => {

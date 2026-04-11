@@ -39,6 +39,7 @@ services:
       WA_VERIFY_TOKEN: ${WA_VERIFY_TOKEN:-wa_appt_os_secure}
       CHATBOT_ENGINE: ${CHATBOT_ENGINE:-python}
       PYTHON_CHATBOT_URL: http://python-bot:8001
+      BOT_SYNC_SECRET: wa_bot_sync_secret_2024
     depends_on:
       mongo:
         condition: service_healthy
@@ -59,6 +60,9 @@ services:
     restart: unless-stopped
     ports:
       - "8001:8001"
+    environment:
+      BACKEND_URL: http://backend:5000
+      BOT_SYNC_SECRET: wa_bot_sync_secret_2024
     networks:
       - wa_net
 
