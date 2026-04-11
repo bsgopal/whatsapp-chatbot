@@ -58,7 +58,7 @@ function ContactModal({ contact, onClose }) {
             mut.mutate();
           }}
         >
-        <h2 className="font-display font-extrabold text-xl text-white mb-5">{isEdit ? 'Edit Contact' : 'Add Contact'}</h2>
+        <h2 className="font-display font-extrabold text-xl text-slate-900 mb-5">{isEdit ? 'Edit Contact' : 'Add Contact'}</h2>
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
@@ -125,7 +125,7 @@ export default function Contacts() {
     <div className="h-full flex flex-col overflow-hidden">
       <div className="topbar flex-shrink-0">
         <div>
-          <h1 className="font-display font-extrabold text-xl text-white">Contacts</h1>
+          <h1 className="font-display font-extrabold text-xl text-slate-900">Contacts</h1>
           <p className="text-xs text-stone-2 mt-0.5">{pagination.total || 0} clients in your CRM</p>
         </div>
         <button className="btn-em" onClick={() => setModal('add')}>+ Add Contact</button>
@@ -161,12 +161,12 @@ export default function Contacts() {
                 className="card p-4 hover:border-ink-7 transition-colors"
               >
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet/40 to-sky/50 flex items-center justify-center text-sm font-bold text-white flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet/40 to-sky/50 flex items-center justify-center text-sm font-bold text-slate-900 flex-shrink-0">
                     {c.name?.[0]?.toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-bold text-white truncate">{c.name}</h3>
+                      <h3 className="text-sm font-bold text-slate-900 truncate">{c.name}</h3>
                       {c.status === 'active' && <span className="w-1.5 h-1.5 rounded-full bg-em flex-shrink-0" />}
                     </div>
                     <div className="text-2xs font-mono text-stone-2 mt-0.5">{c.phone}</div>
@@ -229,3 +229,4 @@ export default function Contacts() {
     </div>
   );
 }
+

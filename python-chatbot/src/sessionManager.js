@@ -34,10 +34,16 @@ function reset(phone) {
   delete sessions[phone];
 }
 
+function resetAll() {
+  Object.keys(sessions).forEach((phone) => {
+    delete sessions[phone];
+  });
+}
+
 function update(phone, data) {
   if (!sessions[phone]) return;
   sessions[phone].data = { ...sessions[phone].data, ...data };
   sessions[phone].lastActivity = Date.now();
 }
 
-module.exports = { get, set, reset, update };
+module.exports = { get, set, reset, resetAll, update };

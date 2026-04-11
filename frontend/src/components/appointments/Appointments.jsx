@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format, parseISO } from 'date-fns';
 import { appointmentsAPI, contactsAPI, staffAPI, servicesAPI } from '../../api';
+import { useSocket } from '../../hooks/useSocket';
 import toast from 'react-hot-toast';
 
 const STATUSES = ['pending','confirmed','checked_in','completed','cancelled','no_show'];
@@ -35,7 +36,7 @@ function BookingModal({ onClose, contacts, staff, services }) {
         className="card p-7 w-full max-w-md max-h-[90vh] overflow-y-auto"
         onClick={e => e.stopPropagation()}
       >
-        <h2 className="font-display font-extrabold text-xl text-white mb-1">Book Appointment</h2>
+        <h2 className="font-display font-extrabold text-xl text-slate-900 mb-1">Book Appointment</h2>
         <p className="text-sm text-stone-2 mb-5">Schedule a new appointment for a client</p>
 
         <div className="space-y-4">
@@ -101,6 +102,12 @@ export default function Appointments() {
   const { data: staffData } = useQuery({ queryKey:['staff'], queryFn:()=>staffAPI.getAll(), select:d=>d.data.data });
   const { data: servicesData } = useQuery({ queryKey:['services'], queryFn:()=>servicesAPI.getAll(), select:d=>d.data.data });
 
+  useSocket((event) => {
+    if (event === 'new_appointment' || event === 'appointment_updated') {
+      qc.invalidateQueries({ queryKey: ['appointments'] });
+    }
+  });
+
   const updateStatus = useMutation({
     mutationFn: ({ id, status }) => appointmentsAPI.update(id, { status }),
     onSuccess: () => { qc.invalidateQueries(['appointments']); toast.success('Status updated'); },
@@ -114,7 +121,7 @@ export default function Appointments() {
       {/* Header */}
       <div className="topbar flex-shrink-0">
         <div>
-          <h1 className="font-display font-extrabold text-xl text-white">Appointments</h1>
+          <h1 className="font-display font-extrabold text-xl text-slate-900">Appointments</h1>
           <p className="text-xs text-stone-2 mt-0.5">Manage and track all bookings</p>
         </div>
         <button className="btn-em" onClick={() => setShowModal(true)}>+ Book Appointment</button>
@@ -124,7 +131,7 @@ export default function Appointments() {
       <div className="flex items-center gap-3 px-6 py-3 bg-ink-2 border-b border-ink-6 flex-shrink-0 overflow-x-auto">
         <button
           onClick={() => setF('status','')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap ${!filters.status ? 'bg-em/10 text-em border border-em/30' : 'bg-ink-4 border border-ink-6 text-stone-2 hover:text-white'}`}
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap ${!filters.status ? 'bg-em/10 text-em border border-em/30' : 'bg-ink-4 border border-ink-6 text-stone-2 hover:text-slate-900'}`}
         >
           All
         </button>
@@ -132,7 +139,7 @@ export default function Appointments() {
           <button
             key={s}
             onClick={() => setF('status', s)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap ${filters.status===s ? 'bg-em/10 text-em border border-em/30' : 'bg-ink-4 border border-ink-6 text-stone-2 hover:text-white'}`}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap ${filters.status===s ? 'bg-em/10 text-em border border-em/30' : 'bg-ink-4 border border-ink-6 text-stone-2 hover:text-slate-900'}`}
           >
             {STATUS_META[s]?.label}
           </button>
@@ -172,11 +179,11 @@ export default function Appointments() {
                   >
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 rounded-full bg-gradient-to-br from-violet/40 to-sky/40 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
+                        <div className="w-7 h-7 rounded-full bg-gradient-to-br from-violet/40 to-sky/40 flex items-center justify-center text-xs font-bold text-slate-900 flex-shrink-0">
                           {apt.contact?.name?.[0]?.toUpperCase()}
                         </div>
                         <div>
-                          <div className="text-sm font-semibold text-white">{apt.contact?.name}</div>
+                          <div className="text-sm font-semibold text-slate-900">{apt.contact?.name}</div>
                           <div className="text-2xs font-mono text-stone-2">{apt.contact?.phone}</div>
                         </div>
                       </div>
@@ -187,10 +194,10 @@ export default function Appointments() {
                     </td>
                     <td className="px-4 py-3 text-sm text-mist-2">{apt.staff?.name || <span className="text-stone-1 text-xs">—</span>}</td>
                     <td className="px-4 py-3">
-                      <div className="text-sm font-mono text-white">{format(new Date(apt.scheduledAt), 'MMM d, yyyy')}</div>
+                      <div className="text-sm font-mono text-slate-900">{format(new Date(apt.scheduledAt), 'MMM d, yyyy')}</div>
                       <div className="text-2xs font-mono text-stone-2">{format(new Date(apt.scheduledAt), 'HH:mm')}</div>
                     </td>
-                    <td className="px-4 py-3 text-sm font-mono font-bold text-white">₹{(apt.servicePrice||0).toLocaleString()}</td>
+                    <td className="px-4 py-3 text-sm font-mono font-bold text-slate-900">₹{(apt.servicePrice||0).toLocaleString()}</td>
                     <td className="px-4 py-3">
                       <select
                         value={apt.status}
@@ -203,7 +210,7 @@ export default function Appointments() {
                           'text-stone-2 border-stone-2/30'
                         }`}
                       >
-                        {STATUSES.map(s => <option key={s} value={s} className="bg-ink-3 text-white">{STATUS_META[s]?.label}</option>)}
+                        {STATUSES.map(s => <option key={s} value={s} className="bg-ink-3 text-slate-900">{STATUS_META[s]?.label}</option>)}
                       </select>
                     </td>
                     <td className="px-4 py-3">
@@ -251,3 +258,4 @@ export default function Appointments() {
     </div>
   );
 }
+

@@ -40,7 +40,7 @@ export default function RegisterPage() {
       className="min-h-screen bg-ink-0 flex items-center justify-center p-4"
       style={{
         backgroundImage:
-          'radial-gradient(ellipse 60% 50% at 70% 20%, rgba(0,230,118,.04) 0%, transparent 60%)',
+          'radial-gradient(ellipse 60% 50% at 70% 20%, rgba(37,99,235,.04) 0%, transparent 60%)',
       }}
     >
       <motion.div
@@ -52,18 +52,18 @@ export default function RegisterPage() {
         <div className="flex items-center gap-3 mb-8 justify-center">
           <div
             className="w-12 h-12 rounded-xl bg-gradient-to-br from-em to-teal flex items-center justify-center text-2xl"
-            style={{ boxShadow: '0 0 0 1px rgba(0,230,118,.35), 0 4px 20px rgba(0,230,118,.18)' }}
+            style={{ boxShadow: '0 0 0 1px rgba(37,99,235,.35), 0 4px 20px rgba(37,99,235,.18)' }}
           >
             📱
           </div>
           <div>
-            <div className="font-display font-extrabold text-xl text-white">WA Appt OS</div>
+            <div className="font-display font-extrabold text-xl text-slate-900">WA Appt OS</div>
             <div className="text-2xs font-mono text-em tracking-widest">14-DAY FREE TRIAL</div>
           </div>
         </div>
 
         <div className="card p-8">
-          <h1 className="font-display font-extrabold text-2xl text-white mb-1">Create account</h1>
+          <h1 className="font-display font-extrabold text-2xl text-slate-900 mb-1">Create account</h1>
           <p className="text-sm text-stone-2 mb-6">
             Your mobile number will be used to log in
           </p>
@@ -186,3 +186,4 @@ export default function RegisterPage() {
     </div>
   );
 }
+

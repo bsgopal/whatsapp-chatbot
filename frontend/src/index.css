@@ -1,71 +1,76 @@
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ── Scrollbar ── */
-/* ── Scrollbar ── */
-::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #2A3A4D; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #00E676; }
+::-webkit-scrollbar-thumb { background: #c5d1de; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #2563eb; }
 
-/* ── Base ── */
 * { box-sizing: border-box; }
-html, body { height: 100%; overflow: hidden; background: #03060F; }
-body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-font-smoothing: antialiased; }
+html, body { height: 100%; overflow-x: hidden; overflow-y: auto; background: #f5f7fb; }
+body {
+  font-family: 'Manrope', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  color: #0f172a;
+  background:
+    radial-gradient(circle at top left, rgba(37, 99, 235, 0.08), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(14, 165, 233, 0.08), transparent 24%),
+    linear-gradient(180deg, #f8fbff 0%, #f3f6fb 100%);
+}
+button, input, textarea, select { font: inherit; }
+#root { height: 100%; }
 
-/* ── Custom utilities ── */
 @layer components {
   .btn-em {
-    @apply bg-gradient-to-r from-em to-teal text-black font-bold text-sm rounded-lg px-4 py-2 flex items-center gap-2 transition-all hover:brightness-110 hover:shadow-em active:scale-95 cursor-pointer border-0;
+    @apply bg-gradient-to-r from-em to-sky text-white font-bold text-sm rounded-xl px-4 py-2.5 flex items-center gap-2 transition-all hover:brightness-105 hover:shadow-em active:scale-95 cursor-pointer border-0 shadow-sm;
   }
   .btn-ghost {
-    @apply bg-ink-4 border border-ink-7 text-mist-2 font-semibold text-sm rounded-lg px-4 py-2 flex items-center gap-2 transition-all hover:bg-ink-5 hover:text-white cursor-pointer;
+    @apply bg-white border border-ink-6 text-mist-2 font-semibold text-sm rounded-xl px-4 py-2.5 flex items-center gap-2 transition-all hover:bg-ink-4 hover:text-mist-3 cursor-pointer shadow-sm;
   }
   .btn-danger {
-    @apply bg-rose/10 border border-rose/30 text-rose font-semibold text-sm rounded-lg px-4 py-2 flex items-center gap-2 transition-all hover:bg-rose/20 cursor-pointer;
+    @apply bg-rose/5 border border-rose/20 text-rose font-semibold text-sm rounded-xl px-4 py-2.5 flex items-center gap-2 transition-all hover:bg-rose/10 cursor-pointer;
   }
   .card {
-    @apply bg-ink-4 border border-ink-6 rounded-xl;
+    @apply bg-white border border-ink-6 rounded-2xl shadow-sm;
   }
   .input {
-    @apply w-full bg-ink-3 border border-ink-6 rounded-lg px-3 py-2 text-sm text-white placeholder-stone-2 focus:outline-none focus:border-em focus:ring-1 focus:ring-em/30 transition-colors;
+    @apply w-full bg-white border border-ink-6 rounded-xl px-3 py-2.5 text-sm text-mist-3 placeholder-stone-2 focus:outline-none focus:border-em focus:ring-2 focus:ring-em/15 transition-colors shadow-sm;
   }
   .label {
     @apply block text-2xs font-semibold text-stone-2 uppercase tracking-wider mb-1.5;
   }
   .badge-em {
-    @apply inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-bold bg-em/10 border border-em/30 text-em;
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-bold bg-em/10 border border-em/20 text-em;
   }
   .badge-sky {
-    @apply inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-bold bg-sky/10 border border-sky/30 text-sky;
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-bold bg-sky/10 border border-sky/20 text-sky;
   }
   .badge-amber {
-    @apply inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-bold bg-amber/10 border border-amber/30 text-amber;
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-bold bg-amber/10 border border-amber/20 text-amber;
   }
   .badge-rose {
-    @apply inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-bold bg-rose/10 border border-rose/30 text-rose;
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-bold bg-rose/10 border border-rose/20 text-rose;
   }
   .badge-violet {
-    @apply inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-bold bg-violet/10 border border-violet/30 text-violet;
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-bold bg-violet/10 border border-violet/20 text-violet;
   }
   .sidebar-item {
-    @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-stone-2 hover:bg-ink-5 hover:text-white cursor-pointer transition-all;
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-stone-2 hover:bg-ink-4 hover:text-mist-3 cursor-pointer transition-all;
   }
   .sidebar-item-active {
-    @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-em/8 border-l-2 border-em text-em cursor-pointer;
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold bg-em/10 border border-em/20 text-em cursor-pointer;
   }
   .stat-card {
-    @apply card p-5 flex flex-col gap-3 hover:border-ink-7 transition-colors cursor-default;
+    @apply card p-5 flex flex-col gap-3 hover:border-em/15 hover:shadow-md transition-all cursor-default;
   }
   .topbar {
-    @apply flex items-center justify-between px-6 py-4 border-b border-ink-6 bg-ink-2 flex-shrink-0;
+    @apply flex items-center justify-between px-6 py-4 border-b border-ink-6 bg-white/90 backdrop-blur-sm flex-shrink-0;
   }
 }
 
-/* ── Animations ── */
 .fu  { animation: fadeUp 0.4s ease both; }
 .fu1 { animation: fadeUp 0.4s ease 0.05s both; }
 .fu2 { animation: fadeUp 0.4s ease 0.10s both; }
@@ -78,8 +83,8 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-font-smoothing: ant
   to { opacity: 1; transform: translateY(0); }
 }
 @keyframes gemPulse {
-  0%,100% { box-shadow: 0 0 0 1px rgba(0,230,118,.35), 0 4px 20px rgba(0,230,118,.18); }
-  50% { box-shadow: 0 0 20px rgba(0,230,118,.4), 0 0 40px rgba(0,230,118,.15); }
+  0%,100% { box-shadow: 0 0 0 1px rgba(37,99,235,.18), 0 18px 42px rgba(37,99,235,.14); }
+  50% { box-shadow: 0 0 0 1px rgba(37,99,235,.24), 0 22px 50px rgba(37,99,235,.18); }
 }
 @keyframes dot-pulse {
   0%,100% { opacity: 1; }

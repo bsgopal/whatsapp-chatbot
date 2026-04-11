@@ -7,11 +7,23 @@ export default defineConfig({
   resolve: {
     alias: { '@': path.resolve(__dirname, 'src') },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom', 'react-router-dom'],
+          query: ['@tanstack/react-query'],
+          charts: ['recharts'],
+          motion: ['framer-motion'],
+        },
+      },
+    },
+  },
   server: {
     port: 3000,
     proxy: {
-      '/api': { target: 'http://localhost:5000', changeOrigin: true },
-      '/socket.io': { target: 'http://localhost:5000', ws: true, changeOrigin: true },
+      '/api': { target: 'http://localhost:5001', changeOrigin: true },
+      '/socket.io': { target: 'http://localhost:5001', ws: true, changeOrigin: true },
     },
   },
 });

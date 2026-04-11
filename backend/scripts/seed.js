@@ -25,11 +25,19 @@ const seed = async () => {
   ]);
   console.log('Cleared all existing data\n');
 
+  const platformOwner = await User.create({
+    name: 'Platform Owner',
+    phone: '9000000001',
+    email: 'owner@waapptos.com',
+    password: 'Owner@123',
+    role: 'super_admin',
+  });
+
   const owner = await User.create({
     name: 'GK',
     phone: '9345578103',
-    email: 'bsgopa0@gmail.com',
-    password: 'Gopal@123',
+    email: 'bsgopal0@gmail.com',
+    password: '123456',
     role: 'owner',
   });
 
@@ -38,7 +46,7 @@ const seed = async () => {
     category: 'salon',
     owner: owner._id,
     phone: '9345578103',
-    email: 'bsgopa0@gmail.com',
+    email: 'bsgopal0@gmail.com',
     address: {
       street: '42 MG Road',
       city: 'Bengaluru',
@@ -59,9 +67,23 @@ const seed = async () => {
       currentPeriodStart: new Date(),
       currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
     },
+    license: {
+      key: 'WA-DEMO-0001',
+      status: 'active',
+      assignedBy: platformOwner._id,
+      startAt: new Date(),
+      endAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      lastPaymentAt: new Date(),
+      lastDurationDays: 30,
+      notes: 'Seeded demo license',
+    },
     botSettings: {
       isEnabled: true,
       welcomeMessage: "Hello! Welcome to Priya's Beauty Studio.\n\n1 Book Appointment\n2 View My Bookings\n3 Our Services\n4 Talk to Staff",
+      menuPrompt: 'Please choose a service by sending the number:',
+      datePrompt: 'Please send your preferred date in YYYY-MM-DD format.',
+      timePrompt: 'Please send your preferred time.',
+      confirmationTemplate: 'Your appointment is booked.',
       autoConfirm: false,
       reminderEnabled: true,
       reminderBeforeHours: 24,
@@ -254,12 +276,17 @@ const seed = async () => {
   ]);
 
   console.log('\n Seed complete!\n');
-  console.log('YOUR LOGIN CREDENTIALS');
-  console.log('Mobile   : 9345578103  (login with this)');
-  console.log('Password : Gopal@123');
-  console.log('Email    : bsgopa0@gmail.com (reference only)');
-  console.log('Name     : GK');
-  console.log('Role     : owner (full access)\n');
+  console.log('PLATFORM OWNER LOGIN');
+  console.log('Mobile   : 9000000001');
+  console.log('Password : Owner@123');
+  console.log('Email    : owner@waapptos.com');
+  console.log('Role     : super_admin\n');
+
+  console.log('CLIENT OWNER LOGIN');
+  console.log('Mobile   : 9345578103');
+  console.log('Password : 123456');
+  console.log('Email    : bsgopal0@gmail.com');
+  console.log('Role     : owner\n');
   console.log('Seeded: ' + contacts.length + ' contacts, ' + aptDocs.length + ' appointments, ' + services.length + ' services, ' + staffMembers.length + ' staff');
 
   await mongoose.disconnect();

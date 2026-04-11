@@ -61,7 +61,6 @@ router.post(
       const phone = normalizePhone(req.body.phone);
       const { password } = req.body;
 
-      // Find by phone (primary login field)
       const user = await User.findOne({ phone }).select('+password');
       if (!user || !(await user.comparePassword(password))) {
         return next(new AppError('Invalid mobile number or password', 401));
@@ -93,7 +92,7 @@ router.post(
       .notEmpty().withMessage('Mobile number is required')
       .customSanitizer((v) => String(v).replace(/\D/g, '').slice(-10))
       .isLength({ min: 10, max: 10 }).withMessage('Enter a valid 10-digit mobile number'),
-    body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters'),
+    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
     body('businessName').trim().notEmpty().withMessage('Business name is required'),
     body('businessCategory')
       .optional()
@@ -189,7 +188,7 @@ router.put(
   protect,
   [
     body('currentPassword').notEmpty().withMessage('Current password is required'),
-    body('newPassword').isLength({ min: 8 }).withMessage('New password must be at least 8 characters'),
+    body('newPassword').isLength({ min: 6 }).withMessage('New password must be at least 6 characters'),
   ],
   async (req, res, next) => {
     try {

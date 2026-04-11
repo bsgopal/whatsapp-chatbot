@@ -17,9 +17,12 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401) {
+    const code = err.response?.data?.code;
+    const isLicenseError = err.response?.status === 403 && ['LICENSE_EXPIRED', 'LICENSE_PENDING', 'LICENSE_SUSPENDED'].includes(code);
+
+    if (err.response?.status === 401 || isLicenseError) {
       localStorage.removeItem('wa_token');
-      window.location.href = '/login';
+      window.location.href = isLicenseError ? `/login?license=${code.toLowerCase()}` : '/login';
     }
     return Promise.reject(err);
   }
@@ -31,6 +34,7 @@ export default api;
 export const authAPI = {
   login: (data) => api.post('/auth/login', data),
   register: (data) => api.post('/auth/register', data),
+  requestLicense: (data) => api.post('/auth/license-request', data),
   me: () => api.get('/auth/me'),
   updateProfile: (data) => api.put('/auth/update-profile', data),
   changePassword: (data) => api.put('/auth/change-password', data),
@@ -84,6 +88,7 @@ export const settingsAPI = {
   get: () => api.get('/settings'),
   update: (data) => api.put('/settings', data),
   updateWhatsApp: (data) => api.put('/settings/whatsapp', data),
+  updateLicense: (data) => api.put('/settings/license', data),
   getBotPreview: () => api.get('/settings/bot-preview'),
   testWhatsApp: (data) => api.post('/settings/whatsapp/test', data),
 };
@@ -100,4 +105,14 @@ export const notificationsAPI = {
   getAll: (params) => api.get('/notifications', { params }),
   markAllRead: () => api.put('/notifications/mark-all-read'),
   markRead: (id) => api.put(`/notifications/${id}/read`),
+};
+
+export const platformAPI = {
+  getOverview: () => api.get('/platform/overview'),
+  getClients: () => api.get('/platform/clients'),
+  getClientDetails: (businessId) => api.get(`/platform/clients/${businessId}`),
+  createClient: (data) => api.post('/platform/clients', data),
+  updateLicense: (businessId, data) => api.put(`/platform/clients/${businessId}/license`, data),
+  getLicenseRequests: (params) => api.get('/platform/license-requests', { params }),
+  updateLicenseRequest: (requestId, data) => api.patch(`/platform/license-requests/${requestId}`, data),
 };

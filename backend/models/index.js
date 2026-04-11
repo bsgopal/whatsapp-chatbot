@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const AuditLog = require('./AuditLog');
+const LicenseRequest = require('./LicenseRequest');
 
 // ─── Contact ───────────────────────────────────────────────────────────────────
 const contactSchema = new mongoose.Schema(
@@ -30,13 +32,19 @@ const contactSchema = new mongoose.Schema(
     botState: {
       stage: {
         type: String,
-        enum: ['idle', 'awaiting_service', 'awaiting_date', 'awaiting_time', 'awaiting_confirmation'],
+        enum: ['idle', 'awaiting_service', 'awaiting_date', 'awaiting_time', 'awaiting_name', 'awaiting_confirmation'],
         default: 'idle',
       },
       selectedService: { type: mongoose.Schema.Types.ObjectId, ref: 'Service' },
       selectedDate: String,
       selectedTime: String,
       lastIntent: String,
+      lastUpdatedAt: Date,
+    },
+    customerProfile: {
+      providedName: { type: String, trim: true },
+      isProfileComplete: { type: Boolean, default: false },
+      firstCapturedAt: Date,
       lastUpdatedAt: Date,
     },
   },
@@ -145,4 +153,6 @@ module.exports = {
   Service: mongoose.model('Service', serviceSchema),
   ChatMessage: mongoose.model('ChatMessage', chatMessageSchema),
   Notification: mongoose.model('Notification', notificationSchema),
+  AuditLog,
+  LicenseRequest,
 };

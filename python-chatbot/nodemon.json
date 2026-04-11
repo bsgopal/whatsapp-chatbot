@@ -1,0 +1,19 @@
+{
+  "watch": [
+    "src",
+    "data/businesses.js",
+    ".env"
+  ],
+  "ext": "js,json",
+  "ignore": [
+    ".wwebjs_auth/**",
+    ".wwebjs_cache/**",
+    ".chrome-profile/**",
+    ".edge-profile/**",
+    "data/.store/**",
+    "__pycache__/**",
+    "node_modules/**",
+    "*.log"
+  ],
+  "delay": "1000"
+}

@@ -182,7 +182,7 @@ async function main() {
     email: email.toLowerCase(),
     password,
     phone: phone || undefined,
-    role: 'owner',
+    role: 'super_admin',
     isActive: true,
   });
 
@@ -225,7 +225,7 @@ async function main() {
   ┌─────────────────────────────────────────────
   │  Name      : ${c.cyan(user.name)}
   │  Email     : ${c.cyan(user.email)}
-  │  Role      : ${c.green(user.role)} ${c.dim('(full access)')}
+  │  Role      : ${c.green('super_admin')} ${c.dim('(full access)')}
   │  User ID   : ${c.dim(user._id.toString())}
   └─────────────────────────────────────────────
 

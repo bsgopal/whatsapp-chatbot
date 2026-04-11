@@ -4,8 +4,8 @@
   "description": "WhatsApp chatbot for booking appointments across multiple businesses",
   "main": "src/bot.js",
   "scripts": {
-    "start": "node src/bot.js",
-    "dev": "nodemon src/bot.js"
+    "start": "node src/bot-supervisor.js",
+    "dev": "nodemon src/bot-supervisor.js"
   },
   "dependencies": {
     "moment": "^2.29.4",

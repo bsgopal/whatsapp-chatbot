@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
@@ -48,6 +48,13 @@ export default function Chat() {
   const [message, setMessage] = useState('');
   const messagesEndRef = useRef(null);
 
+  const extractContactId = useCallback((payload) => {
+    const contact = payload?.contact;
+    if (!contact) return null;
+    if (typeof contact === 'string') return contact;
+    return contact._id || null;
+  }, []);
+
   const { data: convData, refetch: refetchConvs } = useQuery({
     queryKey: ['conversations'],
     queryFn: chatAPI.getConversations,
@@ -66,11 +73,14 @@ export default function Chat() {
   useSocket((event, data) => {
     if (event === 'whatsapp_message' || event === 'new_message') {
       refetchConvs();
-      if (selectedConv?._id === data.contact?._id || selectedConv?.contact?._id === data.contact?._id) {
+      const incomingContactId = extractContactId(data);
+      const selectedContactId = selectedConv?._id || selectedConv?.contact?._id;
+      if (incomingContactId && selectedContactId && String(selectedContactId) === String(incomingContactId)) {
         refetchMessages();
       }
     }
   });
+  
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -121,7 +131,7 @@ export default function Chat() {
       <div className="w-80 flex-shrink-0 border-r border-ink-6 bg-ink-2 flex flex-col">
         <div className="border-b border-ink-6 px-4 py-4">
           <div className="text-2xs font-mono uppercase tracking-[0.2em] text-em">Inbox</div>
-          <h2 className="mt-1 font-display text-lg font-bold text-white">WhatsApp Conversations</h2>
+          <h2 className="mt-1 font-display text-lg font-bold text-slate-900">WhatsApp Conversations</h2>
           <p className="mt-1 text-2xs text-stone-2">{conversations.length} live conversations synced with the bot and staff replies.</p>
         </div>
 
@@ -144,12 +154,12 @@ export default function Chat() {
                   className={`w-full border-b border-ink-6 px-4 py-3 text-left transition-colors ${isSelected ? 'bg-em/8' : 'hover:bg-ink-4'}`}
                 >
                   <div className="flex items-start gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-em/40 to-teal/40 text-sm font-bold text-white">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-em/40 to-teal/40 text-sm font-bold text-slate-900">
                       {contact?.name?.[0]?.toUpperCase() || '?'}
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-2">
-                        <div className="truncate text-sm font-semibold text-white">{contact?.name || contact?.phone}</div>
+                        <div className="truncate text-sm font-semibold text-slate-900">{contact?.name || contact?.phone}</div>
                         {lastMsg?.createdAt ? <div className="text-2xs font-mono text-stone-1">{format(new Date(lastMsg.createdAt), 'HH:mm')}</div> : null}
                       </div>
                       <div className="mt-1 truncate text-2xs text-stone-2">
@@ -178,11 +188,11 @@ export default function Chat() {
           <div className="border-b border-ink-6 bg-ink-2 px-5 py-4">
             <div className="flex flex-col gap-4 xl:flex-row xl:items-center">
               <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-em/40 to-teal/40 text-sm font-bold text-white">
+                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-em/40 to-teal/40 text-sm font-bold text-slate-900">
                   {selectedContact?.name?.[0]?.toUpperCase() || '?'}
                 </div>
                 <div>
-                  <div className="text-base font-bold text-white">{selectedContact?.name || 'Unknown contact'}</div>
+                  <div className="text-base font-bold text-slate-900">{selectedContact?.name || 'Unknown contact'}</div>
                   <div className="mt-1 text-2xs font-mono text-stone-2">{selectedContact?.phone || 'No phone'}</div>
                 </div>
               </div>
@@ -197,22 +207,22 @@ export default function Chat() {
             <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
               <div className="rounded-2xl border border-ink-6 bg-ink-3 p-3">
                 <div className="text-2xs font-mono uppercase tracking-[0.2em] text-stone-2">Messages</div>
-                <div className="mt-2 text-lg font-display font-bold text-white">{selectedContact?.totalMessages || 0}</div>
+                <div className="mt-2 text-lg font-display font-bold text-slate-900">{selectedContact?.totalMessages || 0}</div>
               </div>
               <div className="rounded-2xl border border-ink-6 bg-ink-3 p-3">
                 <div className="text-2xs font-mono uppercase tracking-[0.2em] text-stone-2">Appointments</div>
-                <div className="mt-2 text-lg font-display font-bold text-white">{selectedContact?.totalAppointments || 0}</div>
+                <div className="mt-2 text-lg font-display font-bold text-slate-900">{selectedContact?.totalAppointments || 0}</div>
               </div>
               <div className="rounded-2xl border border-ink-6 bg-ink-3 p-3">
                 <div className="text-2xs font-mono uppercase tracking-[0.2em] text-stone-2">Bot Progress</div>
-                <div className="mt-2 text-sm font-semibold text-white">{selectedContact?.botState?.stage ? selectedContact.botState.stage.replaceAll('_', ' ') : 'idle'}</div>
+                <div className="mt-2 text-sm font-semibold text-slate-900">{selectedContact?.botState?.stage ? selectedContact.botState.stage.replaceAll('_', ' ') : 'idle'}</div>
               </div>
             </div>
           </div>
 
           <div
             className="flex-1 overflow-y-auto px-5 py-4 space-y-3"
-            style={{ backgroundImage: 'radial-gradient(ellipse 80% 40% at 50% 0%, rgba(0,230,118,.03) 0%, transparent 50%)' }}
+            style={{ backgroundImage: 'radial-gradient(ellipse 80% 40% at 50% 0%, rgba(37,99,235,.03) 0%, transparent 50%)' }}
           >
             {messages.map((msg, index) => {
               const isOut = msg.direction === 'outbound';
@@ -226,7 +236,7 @@ export default function Chat() {
                 >
                   <div className={`max-w-xs lg:max-w-xl rounded-2xl border px-4 py-3 ${isOut ? 'bg-em/12 border-em/20 rounded-br-sm' : 'bg-ink-4 border-ink-6 rounded-bl-sm'}`}>
                     {msg.type !== 'text' ? <div className="mb-1 text-2xs font-mono uppercase tracking-[0.2em] text-stone-2">{msg.type}</div> : null}
-                    <div className="text-sm leading-relaxed text-white whitespace-pre-line">{msg.content}</div>
+                    <div className="text-sm leading-relaxed text-slate-900 whitespace-pre-line">{msg.content}</div>
                     <div className={`mt-2 flex flex-wrap items-center gap-2 ${isOut ? 'justify-end' : 'justify-start'}`}>
                       <div className="text-2xs font-mono text-stone-1">{format(new Date(msg.createdAt), 'HH:mm')}</div>
                       {isOut ? <StatusPill status={msg.status} /> : null}
@@ -266,7 +276,7 @@ export default function Chat() {
                   }}
                   rows={2}
                   placeholder="Reply on WhatsApp..."
-                  className="w-full resize-none bg-transparent text-sm text-white placeholder-stone-2 outline-none"
+                  className="w-full resize-none bg-transparent text-sm text-slate-900 placeholder-stone-2 outline-none"
                 />
               </div>
               <button
@@ -288,7 +298,7 @@ export default function Chat() {
       ) : (
         <div className="flex-1 flex items-center justify-center bg-ink-1">
           <div className="text-center">
-            <h3 className="font-display text-2xl font-bold text-white">WhatsApp Inbox</h3>
+            <h3 className="font-display text-2xl font-bold text-slate-900">WhatsApp Inbox</h3>
             <p className="mt-2 text-sm text-stone-2">Select a conversation to view bot progress, message history, and live staff replies.</p>
           </div>
         </div>
@@ -296,3 +306,4 @@ export default function Chat() {
     </div>
   );
 }
+

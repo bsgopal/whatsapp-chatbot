@@ -78,7 +78,7 @@ export default function Analytics() {
     <div className="h-full overflow-y-auto bg-ink-1 p-6 space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display font-extrabold text-2xl text-white">Analytics</h1>
+          <h1 className="font-display font-extrabold text-2xl text-slate-900">Analytics</h1>
           <p className="text-xs text-stone-2 mt-1">Business performance and live chatbot funnel metrics</p>
         </div>
         <div className="flex gap-1 bg-ink-3 border border-ink-6 rounded-lg p-1">
@@ -86,7 +86,7 @@ export default function Analytics() {
             <button
               key={item}
               onClick={() => setPeriod(item)}
-              className={`px-3 py-1.5 rounded text-xs font-semibold transition-all ${period === item ? 'bg-ink-6 text-white' : 'text-stone-2 hover:text-white'}`}
+              className={`px-3 py-1.5 rounded text-xs font-semibold transition-all ${period === item ? 'bg-ink-6 text-slate-900' : 'text-stone-2 hover:text-slate-900'}`}
             >
               {item}
             </button>
@@ -103,7 +103,7 @@ export default function Analytics() {
 
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="card p-5">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-display font-bold text-sm text-white">Revenue Trend</h3>
+          <h3 className="font-display font-bold text-sm text-slate-900">Revenue Trend</h3>
           <span className="badge-em">{period}</span>
         </div>
         <ResponsiveContainer width="100%" height={200}>
@@ -114,7 +114,7 @@ export default function Analytics() {
                 <stop offset="100%" stopColor="#38BDF8" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <XAxis dataKey="date" tick={{ fill: '#617484', fontSize: 10, fontFamily: 'JetBrains Mono' }} axisLine={false} tickLine={false} />
+            <XAxis dataKey="date" tick={{ fill: '#617484', fontSize: 10, fontFamily: 'IBM Plex Mono' }} axisLine={false} tickLine={false} />
             <YAxis hide />
             <Tooltip content={<CustomTooltip />} />
             <Area type="monotone" dataKey="revenue" name="Revenue" stroke="#38BDF8" strokeWidth={2} fill="url(#revGrad)" />
@@ -124,7 +124,7 @@ export default function Analytics() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="card p-5 md:col-span-2">
-          <h3 className="font-display font-bold text-sm text-white mb-4">Top Services by Bookings</h3>
+          <h3 className="font-display font-bold text-sm text-slate-900 mb-4">Top Services by Bookings</h3>
           {topServices.length === 0 ? (
             <p className="text-stone-2 text-sm text-center py-8">No data yet</p>
           ) : (
@@ -142,7 +142,7 @@ export default function Analytics() {
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="card p-5">
-          <h3 className="font-display font-bold text-sm text-white mb-4">Status Distribution</h3>
+          <h3 className="font-display font-bold text-sm text-slate-900 mb-4">Status Distribution</h3>
           {statusDist.length === 0 ? (
             <p className="text-stone-2 text-sm text-center py-8">No data</p>
           ) : (
@@ -162,7 +162,7 @@ export default function Analytics() {
                       <div className="w-2.5 h-2.5 rounded-sm" style={{ background: COLORS[index % COLORS.length] }} />
                       <span className="text-2xs text-mist-2 capitalize">{item._id}</span>
                     </div>
-                    <span className="text-2xs font-mono font-bold text-white">{item.count}</span>
+                    <span className="text-2xs font-mono font-bold text-slate-900">{item.count}</span>
                   </div>
                 ))}
               </div>
@@ -174,7 +174,7 @@ export default function Analytics() {
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="card p-5">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="font-display font-bold text-sm text-white">Chatbot Analytics</h3>
+            <h3 className="font-display font-bold text-sm text-slate-900">Chatbot Analytics</h3>
             <p className="text-2xs text-stone-2 mt-1">Live metrics from bot replies, WhatsApp bookings, failures, and drop-off stages.</p>
           </div>
           <span className="badge-em">{period}</span>
@@ -190,7 +190,7 @@ export default function Analytics() {
 
         <div className="mt-5 grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-4">
           <div className="rounded-2xl border border-ink-6 bg-ink-3 p-4">
-            <h4 className="font-display font-bold text-sm text-white mb-3">Bot Funnel Trend</h4>
+            <h4 className="font-display font-bold text-sm text-slate-900 mb-3">Bot Funnel Trend</h4>
             {chatbotTrend.length === 0 ? (
               <p className="text-sm text-stone-2 py-10 text-center">No chatbot activity in this period.</p>
             ) : (
@@ -206,7 +206,7 @@ export default function Analytics() {
                       <stop offset="100%" stopColor="#A78BFA" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <XAxis dataKey="date" tick={{ fill: '#617484', fontSize: 10, fontFamily: 'JetBrains Mono' }} axisLine={false} tickLine={false} />
+                  <XAxis dataKey="date" tick={{ fill: '#617484', fontSize: 10, fontFamily: 'IBM Plex Mono' }} axisLine={false} tickLine={false} />
                   <YAxis hide />
                   <Tooltip content={<CustomTooltip />} />
                   <Area type="monotone" dataKey="botMessages" name="Bot Messages" stroke="#00E676" strokeWidth={2} fill="url(#botMsgGrad)" />
@@ -217,7 +217,7 @@ export default function Analytics() {
           </div>
 
           <div className="rounded-2xl border border-ink-6 bg-ink-3 p-4">
-            <h4 className="font-display font-bold text-sm text-white mb-3">Drop-off Stages</h4>
+            <h4 className="font-display font-bold text-sm text-slate-900 mb-3">Drop-off Stages</h4>
             {stageDropoff.length === 0 ? (
               <p className="text-sm text-stone-2 py-10 text-center">No active drop-offs right now.</p>
             ) : (
@@ -239,7 +239,7 @@ export default function Analytics() {
                         <div className="w-2.5 h-2.5 rounded-sm" style={{ background: COLORS[index % COLORS.length] }} />
                         <span>{item.name.replaceAll('_', ' ')}</span>
                       </div>
-                      <span className="font-mono text-white">{item.value}</span>
+                      <span className="font-mono text-slate-900">{item.value}</span>
                     </div>
                   ))}
                 </div>
@@ -250,7 +250,7 @@ export default function Analytics() {
 
         <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="rounded-2xl border border-ink-6 bg-ink-3 p-4">
-            <h4 className="font-display font-bold text-sm text-white mb-3">Booking Sources</h4>
+            <h4 className="font-display font-bold text-sm text-slate-900 mb-3">Booking Sources</h4>
             {sourceDist.length === 0 ? (
               <p className="text-sm text-stone-2">No booking source data yet.</p>
             ) : (
@@ -259,7 +259,7 @@ export default function Analytics() {
                   <div key={item._id} className="flex items-center justify-between rounded-xl bg-ink-2 px-3 py-2">
                     <div className="flex items-center gap-2">
                       <div className="w-2.5 h-2.5 rounded-sm" style={{ background: COLORS[index % COLORS.length] }} />
-                      <span className="text-sm text-white capitalize">{item._id}</span>
+                      <span className="text-sm text-slate-900 capitalize">{item._id}</span>
                     </div>
                     <span className="text-2xs font-mono text-stone-2">{item.count}</span>
                   </div>
@@ -269,7 +269,7 @@ export default function Analytics() {
           </div>
 
           <div className="rounded-2xl border border-ink-6 bg-ink-3 p-4">
-            <h4 className="font-display font-bold text-sm text-white mb-3">Action Notes</h4>
+            <h4 className="font-display font-bold text-sm text-slate-900 mb-3">Action Notes</h4>
             <div className="space-y-2 text-sm text-stone-2">
               <div>Delivery failures usually mean an expired Meta token or phone number restrictions.</div>
               <div>High drop-off at `awaiting_service` means the welcome/menu copy should be clearer.</div>
@@ -282,3 +282,4 @@ export default function Analytics() {
     </div>
   );
 }
+

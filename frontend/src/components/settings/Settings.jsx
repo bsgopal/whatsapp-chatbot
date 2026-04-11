@@ -36,7 +36,7 @@ function StatTile({ label, value, hint, tone = 'default' }) {
   return (
     <div className={`rounded-2xl border p-4 ${toneClass}`}>
       <div className="text-2xs font-mono uppercase tracking-[0.2em] text-stone-2">{label}</div>
-      <div className="mt-2 text-2xl font-display font-bold text-white">{value}</div>
+      <div className="mt-2 text-2xl font-display font-bold text-slate-900">{value}</div>
       {hint ? <div className="mt-1 text-2xs text-stone-2">{hint}</div> : null}
     </div>
   );
@@ -46,7 +46,7 @@ function FlowBubble({ from, text }) {
   const isBot = from === 'bot';
   return (
     <div className={`flex ${isBot ? 'justify-start' : 'justify-end'}`}>
-      <div className={`max-w-md rounded-2xl px-4 py-3 text-sm leading-relaxed border ${isBot ? 'bg-ink-3 border-ink-6 text-white rounded-bl-sm' : 'bg-em/10 border-em/25 text-white rounded-br-sm'}`}>
+      <div className={`max-w-md rounded-2xl px-4 py-3 text-sm leading-relaxed border ${isBot ? 'bg-ink-3 border-ink-6 text-slate-900 rounded-bl-sm' : 'bg-em/10 border-em/25 text-slate-900 rounded-br-sm'}`}>
         <div className="mb-1 text-2xs font-mono uppercase tracking-[0.2em] text-stone-2">{isBot ? 'Bot' : 'Customer'}</div>
         <div className="whitespace-pre-line">{text}</div>
       </div>
@@ -101,7 +101,7 @@ function BusinessTab({ business, onSave }) {
       </div>
 
       <div className="card p-6">
-        <h3 className="font-display font-bold text-base text-white mb-1">Business Information</h3>
+        <h3 className="font-display font-bold text-base text-slate-900 mb-1">Business Information</h3>
         <p className="text-xs text-stone-2 mb-5">This profile powers your booking bot, invoices, and customer-facing messages.</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="md:col-span-2">
@@ -179,7 +179,7 @@ function WhatsAppTab({ business, onSaveWA, onTest, isTesting, testResult }) {
 
       <div className="grid grid-cols-1 xl:grid-cols-[1.35fr_0.9fr] gap-6">
         <div className="card p-6">
-          <h3 className="font-display font-bold text-base text-white mb-1">WhatsApp Cloud API</h3>
+          <h3 className="font-display font-bold text-base text-slate-900 mb-1">WhatsApp Cloud API</h3>
           <p className="text-xs text-stone-2 mb-5">Save your Meta credentials here and verify the setup before going live.</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -225,11 +225,11 @@ function WhatsAppTab({ business, onSaveWA, onTest, isTesting, testResult }) {
 
           {testResult ? (
             <div className="mt-5 rounded-2xl border border-sky/20 bg-sky/5 p-4">
-              <div className="text-sm font-semibold text-white">Connection test result</div>
+              <div className="text-sm font-semibold text-slate-900">Connection test result</div>
               <div className="mt-2 text-sm text-stone-2">
-                <div>Verified Name: <span className="text-white">{testResult.verifiedName || 'Unavailable'}</span></div>
-                <div>Display Number: <span className="text-white">{testResult.displayPhoneNumber || 'Unavailable'}</span></div>
-                <div>Test Message: <span className="text-white">{testResult.testMessageSent ? 'Sent' : 'Skipped'}</span></div>
+                <div>Verified Name: <span className="text-slate-900">{testResult.verifiedName || 'Unavailable'}</span></div>
+                <div>Display Number: <span className="text-slate-900">{testResult.displayPhoneNumber || 'Unavailable'}</span></div>
+                <div>Test Message: <span className="text-slate-900">{testResult.testMessageSent ? 'Sent' : 'Skipped'}</span></div>
               </div>
             </div>
           ) : null}
@@ -245,7 +245,7 @@ function WhatsAppTab({ business, onSaveWA, onTest, isTesting, testResult }) {
         </div>
 
         <div className="card p-6">
-          <h3 className="font-display font-bold text-base text-white mb-1">Launch Checklist</h3>
+          <h3 className="font-display font-bold text-base text-slate-900 mb-1">Launch Checklist</h3>
           <p className="text-xs text-stone-2 mb-4">Use this before pointing customers to the number.</p>
           <div className="space-y-3">
             {[
@@ -256,7 +256,7 @@ function WhatsAppTab({ business, onSaveWA, onTest, isTesting, testResult }) {
               { label: 'At least one service is bookable', done: true },
             ].map((item) => (
               <div key={item.label} className={`rounded-xl border p-3 ${item.done ? 'border-em/20 bg-em/5' : 'border-amber/20 bg-amber/5'}`}>
-                <div className="text-sm font-medium text-white">{item.label}</div>
+                <div className="text-sm font-medium text-slate-900">{item.label}</div>
                 <div className={`text-2xs mt-1 ${item.done ? 'text-em' : 'text-amber'}`}>{item.done ? 'Ready' : 'Needs setup'}</div>
               </div>
             ))}
@@ -271,6 +271,17 @@ function BotTab({ business, services, botPreview, onSave }) {
   const [bot, setBot] = useState(business?.botSettings || {
     isEnabled: true,
     welcomeMessage: 'Hello! Welcome to our appointment booking system. How can I help you today?',
+    menuPrompt: 'Please choose a service by sending the number:',
+    datePrompt: 'Please send your preferred date in YYYY-MM-DD format.',
+    timePrompt: 'Please send your preferred time.',
+    confirmationTemplate: 'Your appointment is booked.',
+    noServicesMessage: 'We have no bookable services configured yet. Please contact the business directly.',
+    invalidServiceMessage: "I couldn't match that service. Please choose one from the menu.",
+    invalidDateMessage: 'Please send a valid date like 2026-04-06, today, or tomorrow.',
+    invalidTimeMessage: 'Please send a valid time like 10:30, 15:00, or 3 pm.',
+    outOfHoursMessage: 'That time is outside business hours. Please choose another time.',
+    slotUnavailableMessage: 'That slot is already booked. Please send another time.',
+    namePromptMessage: 'Please send your name to confirm the booking.',
     language: 'en',
     autoConfirm: false,
     reminderEnabled: true,
@@ -281,6 +292,17 @@ function BotTab({ business, services, botPreview, onSave }) {
     setBot(business?.botSettings || {
       isEnabled: true,
       welcomeMessage: 'Hello! Welcome to our appointment booking system. How can I help you today?',
+      menuPrompt: 'Please choose a service by sending the number:',
+      datePrompt: 'Please send your preferred date in YYYY-MM-DD format.',
+      timePrompt: 'Please send your preferred time.',
+      confirmationTemplate: 'Your appointment is booked.',
+      noServicesMessage: 'We have no bookable services configured yet. Please contact the business directly.',
+      invalidServiceMessage: "I couldn't match that service. Please choose one from the menu.",
+      invalidDateMessage: 'Please send a valid date like 2026-04-06, today, or tomorrow.',
+      invalidTimeMessage: 'Please send a valid time like 10:30, 15:00, or 3 pm.',
+      outOfHoursMessage: 'That time is outside business hours. Please choose another time.',
+      slotUnavailableMessage: 'That slot is already booked. Please send another time.',
+      namePromptMessage: 'Please send your name to confirm the booking.',
       language: 'en',
       autoConfirm: false,
       reminderEnabled: true,
@@ -312,7 +334,7 @@ function BotTab({ business, services, botPreview, onSave }) {
         <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <div>
             <div className="text-2xs font-mono uppercase tracking-[0.2em] text-stone-2">Chatbot Engine</div>
-            <div className="mt-1 text-lg font-display font-bold text-white">{engineValue}</div>
+            <div className="mt-1 text-lg font-display font-bold text-slate-900">{engineValue}</div>
             <div className="mt-1 text-xs text-stone-2">{engineHint}</div>
           </div>
           <DeliveryBadge status={engine?.active === 'python' && engine?.isAvailable ? 'delivered' : 'failed'} />
@@ -324,7 +346,7 @@ function BotTab({ business, services, botPreview, onSave }) {
         <div className="card p-6">
           <div className="flex items-center justify-between mb-5">
             <div>
-              <h3 className="font-display font-bold text-base text-white">Chatbot Controls</h3>
+              <h3 className="font-display font-bold text-base text-slate-900">Chatbot Controls</h3>
               <p className="text-xs text-stone-2 mt-0.5">Control the live WhatsApp booking assistant.</p>
             </div>
             <Toggle value={bot.isEnabled} onChange={(value) => set('isEnabled', value)} />
@@ -335,6 +357,56 @@ function BotTab({ business, services, botPreview, onSave }) {
               <label className="label">Welcome Message</label>
               <textarea className="input resize-none" rows={4} value={bot.welcomeMessage} onChange={(e) => set('welcomeMessage', e.target.value)} />
               <p className="text-2xs text-stone-2 mt-1">The bot uses this before offering the service menu.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="label">Menu Prompt</label>
+                <input className="input" value={bot.menuPrompt || ''} onChange={(e) => set('menuPrompt', e.target.value)} />
+              </div>
+              <div>
+                <label className="label">Confirmation Message</label>
+                <input className="input" value={bot.confirmationTemplate || ''} onChange={(e) => set('confirmationTemplate', e.target.value)} />
+              </div>
+              <div>
+                <label className="label">Date Prompt</label>
+                <input className="input" value={bot.datePrompt || ''} onChange={(e) => set('datePrompt', e.target.value)} />
+              </div>
+              <div>
+                <label className="label">Time Prompt</label>
+                <input className="input" value={bot.timePrompt || ''} onChange={(e) => set('timePrompt', e.target.value)} />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="label">No Services Message</label>
+                <input className="input" value={bot.noServicesMessage || ''} onChange={(e) => set('noServicesMessage', e.target.value)} />
+              </div>
+              <div>
+                <label className="label">Invalid Service Message</label>
+                <input className="input" value={bot.invalidServiceMessage || ''} onChange={(e) => set('invalidServiceMessage', e.target.value)} />
+              </div>
+              <div>
+                <label className="label">Invalid Date Message</label>
+                <input className="input" value={bot.invalidDateMessage || ''} onChange={(e) => set('invalidDateMessage', e.target.value)} />
+              </div>
+              <div>
+                <label className="label">Invalid Time Message</label>
+                <input className="input" value={bot.invalidTimeMessage || ''} onChange={(e) => set('invalidTimeMessage', e.target.value)} />
+              </div>
+              <div>
+                <label className="label">Out Of Hours Message</label>
+                <input className="input" value={bot.outOfHoursMessage || ''} onChange={(e) => set('outOfHoursMessage', e.target.value)} />
+              </div>
+              <div>
+                <label className="label">Slot Unavailable Message</label>
+                <input className="input" value={bot.slotUnavailableMessage || ''} onChange={(e) => set('slotUnavailableMessage', e.target.value)} />
+              </div>
+              <div className="md:col-span-2">
+                <label className="label">Name Prompt Message</label>
+                <input className="input" value={bot.namePromptMessage || ''} onChange={(e) => set('namePromptMessage', e.target.value)} />
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -362,7 +434,7 @@ function BotTab({ business, services, botPreview, onSave }) {
               <div className="rounded-2xl border border-ink-6 bg-ink-3 p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <div className="text-sm text-white font-semibold">Auto-confirm appointments</div>
+                    <div className="text-sm text-slate-900 font-semibold">Auto-confirm appointments</div>
                     <div className="text-2xs text-stone-2 mt-1">Useful for fixed-duration services with simple scheduling.</div>
                   </div>
                   <Toggle value={bot.autoConfirm} onChange={(value) => set('autoConfirm', value)} />
@@ -371,7 +443,7 @@ function BotTab({ business, services, botPreview, onSave }) {
               <div className="rounded-2xl border border-ink-6 bg-ink-3 p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <div className="text-sm text-white font-semibold">Send reminders</div>
+                    <div className="text-sm text-slate-900 font-semibold">Send reminders</div>
                     <div className="text-2xs text-stone-2 mt-1">The backend uses this window for reminder scheduling.</div>
                   </div>
                   <Toggle value={bot.reminderEnabled} onChange={(value) => set('reminderEnabled', value)} />
@@ -385,7 +457,7 @@ function BotTab({ business, services, botPreview, onSave }) {
 
         <div className="space-y-6">
           <div className="card p-6">
-            <h3 className="font-display font-bold text-base text-white mb-1">Live Bot Preview</h3>
+            <h3 className="font-display font-bold text-base text-slate-900 mb-1">Live Bot Preview</h3>
             <p className="text-xs text-stone-2 mb-4">This is the booking flow your WhatsApp users will see.</p>
             <div className="space-y-3">
               {previewFlow.map((item, index) => (
@@ -395,10 +467,10 @@ function BotTab({ business, services, botPreview, onSave }) {
           </div>
 
           <div className="card p-6">
-            <h3 className="font-display font-bold text-base text-white mb-4">Booking Inputs</h3>
+            <h3 className="font-display font-bold text-base text-slate-900 mb-4">Booking Inputs</h3>
             <div className="space-y-3">
               <div className="rounded-xl border border-ink-6 bg-ink-3 p-4">
-                <div className="text-sm font-semibold text-white">Bookable Services</div>
+                <div className="text-sm font-semibold text-slate-900">Bookable Services</div>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {services.length ? services.map((service) => (
                     <span key={service._id} className="rounded-full border border-em/20 bg-em/5 px-3 py-1 text-2xs text-em">
@@ -408,12 +480,12 @@ function BotTab({ business, services, botPreview, onSave }) {
                 </div>
               </div>
               <div className="rounded-xl border border-ink-6 bg-ink-3 p-4">
-                <div className="text-sm font-semibold text-white">Open Days</div>
+                <div className="text-sm font-semibold text-slate-900">Open Days</div>
                 <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2">
                   {openHours.length ? openHours.map((day) => (
                     <div key={day.day} className="rounded-lg bg-ink-2 px-3 py-2">
                       <div className="text-2xs font-mono uppercase tracking-[0.2em] text-stone-2">{day.day}</div>
-                      <div className="text-sm text-white mt-1">{day.openTime} - {day.closeTime}</div>
+                      <div className="text-sm text-slate-900 mt-1">{day.openTime} - {day.closeTime}</div>
                     </div>
                   )) : <span className="text-sm text-stone-2">Business hours not configured.</span>}
                 </div>
@@ -426,10 +498,40 @@ function BotTab({ business, services, botPreview, onSave }) {
   );
 }
 
-function BillingTab({ business }) {
+function BillingTab({ business, isOwner, onLicenseUpdate, isSavingLicense }) {
   const currentPlan = business?.subscription?.plan || 'starter';
+  const license = business?.license || {};
+  const expiry = license?.endAt ? new Date(license.endAt) : null;
+  const daysRemaining = expiry ? Math.ceil((expiry.getTime() - Date.now()) / (24 * 60 * 60 * 1000)) : null;
+  const [licenseForm, setLicenseForm] = useState({
+    durationValue: business?.license?.lastDurationValue || 30,
+    durationUnit: business?.license?.lastDurationUnit || 'day',
+    plan: business?.subscription?.plan || 'starter',
+    status: business?.license?.status || 'active',
+    notes: '',
+  });
+
+  useEffect(() => {
+    setLicenseForm({
+      durationValue: business?.license?.lastDurationValue || 30,
+      durationUnit: business?.license?.lastDurationUnit || 'day',
+      plan: business?.subscription?.plan || 'starter',
+      status: business?.license?.status || 'active',
+      notes: '',
+    });
+  }, [business]);
+
+  const setLicenseFormField = (key, value) => setLicenseForm((current) => ({ ...current, [key]: value }));
+
   return (
     <div className="space-y-5">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <StatTile label="License Status" value={license?.status || 'pending'} hint="Controlled by platform owner" tone={license?.status === 'active' ? 'good' : 'warn'} />
+        <StatTile label="License Key" value={license?.key || 'Not assigned'} hint="Use this for owner support" />
+        <StatTile label="Valid Until" value={license?.endAt ? new Date(license.endAt).toLocaleDateString('en-IN') : 'Not set'} hint="Client data stays safe even after expiry" />
+        <StatTile label="Days Left" value={daysRemaining !== null ? daysRemaining : 'NA'} hint="Owner receives renewal alerts before expiry" tone={daysRemaining !== null && daysRemaining <= 7 ? 'warn' : 'default'} />
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {PLANS.map((plan) => {
           const isCurrent = currentPlan === plan.id;
@@ -441,13 +543,13 @@ function BillingTab({ business }) {
               className={`card p-6 flex flex-col ${isCurrent ? 'border-em shadow-em' : ''} ${plan.recommended ? 'relative' : ''}`}
             >
               {plan.recommended && !isCurrent ? (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-violet px-3 py-1 text-2xs font-bold text-white">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-violet px-3 py-1 text-2xs font-bold text-slate-900">
                   Recommended
                 </div>
               ) : null}
-              <div className="font-display text-lg font-extrabold text-white">{plan.name}</div>
+              <div className="font-display text-lg font-extrabold text-slate-900">{plan.name}</div>
               <div className="mt-2 flex items-end gap-1">
-                <span className="font-display text-3xl font-extrabold text-white">{plan.price}</span>
+                <span className="font-display text-3xl font-extrabold text-slate-900">{plan.price}</span>
                 <span className="text-xs text-stone-2">{plan.period}</span>
               </div>
               <div className="mt-4 space-y-2 flex-1">
@@ -462,7 +564,74 @@ function BillingTab({ business }) {
           );
         })}
       </div>
-      <div className="card p-4 text-center text-sm text-stone-2">Payments are handled with Razorpay and can be connected later.</div>
+      {isOwner ? (
+        <div className="card p-6">
+          <h3 className="font-display font-bold text-base text-slate-900 mb-4">Owner License Control</h3>
+          <p className="text-xs text-stone-2 mb-5">Generate or renew your workspace license directly from the settings page.</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="label">Duration</label>
+              <input
+                type="number"
+                min={1}
+                className="input"
+                value={licenseForm.durationValue}
+                onChange={(e) => setLicenseFormField('durationValue', Number(e.target.value))}
+              />
+            </div>
+            <div>
+              <label className="label">Duration Unit</label>
+              <select className="input" value={licenseForm.durationUnit} onChange={(e) => setLicenseFormField('durationUnit', e.target.value)}>
+                <option value="day">Days</option>
+                <option value="month">Months</option>
+              </select>
+            </div>
+            <div>
+              <label className="label">Plan</label>
+              <select className="input" value={licenseForm.plan} onChange={(e) => setLicenseFormField('plan', e.target.value)}>
+                {PLANS.map((plan) => (
+                  <option key={plan.id} value={plan.id}>{plan.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="label">Status</label>
+              <select className="input" value={licenseForm.status} onChange={(e) => setLicenseFormField('status', e.target.value)}>
+                <option value="active">Active</option>
+                <option value="pending">Pending</option>
+                <option value="suspended">Suspended</option>
+                <option value="expired">Expired</option>
+              </select>
+            </div>
+            <div className="md:col-span-2">
+              <label className="label">Notes</label>
+              <textarea
+                rows={3}
+                className="input resize-none"
+                value={licenseForm.notes}
+                onChange={(e) => setLicenseFormField('notes', e.target.value)}
+                placeholder="Renewal notes or owner remarks"
+              />
+            </div>
+          </div>
+          <button
+            className="btn-em mt-5"
+            type="button"
+            onClick={() => onLicenseUpdate(licenseForm)}
+            disabled={isSavingLicense}
+          >
+            {business?.license?.key ? 'Renew License' : 'Generate License'}
+          </button>
+          <p className="mt-3 text-2xs text-stone-2">The platform owner can still approve and manage final activation if required.</p>
+        </div>
+      ) : (
+        <div className="card p-6 text-sm text-stone-2">
+          Only the business owner can manage license generation from settings. Use the login license request form if you need renewal.
+        </div>
+      )}
+      <div className="card p-4 text-center text-sm text-stone-2">
+        Payments are handled by the platform owner. If your license is close to expiry, use the login page request form to ask for renewal.
+      </div>
     </div>
   );
 }
@@ -471,7 +640,7 @@ export default function Settings() {
   const [activeTab, setActiveTab] = useState('whatsapp');
   const [testResult, setTestResult] = useState(null);
   const qc = useQueryClient();
-  const { updateBusiness } = useAuthStore();
+  const { user, updateBusiness } = useAuthStore();
 
   const { data: businessData } = useQuery({
     queryKey: ['settings'],
@@ -517,6 +686,16 @@ export default function Settings() {
     onError: () => toast.error('Failed to save WhatsApp settings'),
   });
 
+  const saveLicenseMut = useMutation({
+    mutationFn: (payload) => settingsAPI.updateLicense(payload),
+    onSuccess: (response) => {
+      qc.invalidateQueries({ queryKey: ['settings'] });
+      updateBusiness(response.data.data);
+      toast.success('License settings saved');
+    },
+    onError: () => toast.error('Failed to save license settings'),
+  });
+
   const testMut = useMutation({
     mutationFn: settingsAPI.testWhatsApp,
     onSuccess: (response) => {
@@ -547,7 +726,7 @@ export default function Settings() {
       <div className="w-56 flex-shrink-0 border-r border-ink-6 bg-ink-2 p-4">
         <div className="rounded-2xl border border-em/20 bg-em/5 p-4">
           <div className="text-2xs font-mono uppercase tracking-[0.2em] text-em">WhatsApp Bot</div>
-          <div className="mt-2 text-lg font-display font-bold text-white">{business?.name || 'Business Settings'}</div>
+          <div className="mt-2 text-lg font-display font-bold text-slate-900">{business?.name || 'Business Settings'}</div>
           <div className="mt-1 text-xs text-stone-2">Configure the live booking chatbot, delivery status, and staff inbox.</div>
         </div>
 
@@ -558,7 +737,7 @@ export default function Settings() {
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id)}
-              className={`w-full rounded-xl px-3 py-3 text-left text-sm transition-colors ${activeTab === tab.id ? 'bg-em/10 text-em border border-em/20' : 'text-stone-2 hover:bg-ink-5 hover:text-white border border-transparent'}`}
+              className={`w-full rounded-xl px-3 py-3 text-left text-sm transition-colors ${activeTab === tab.id ? 'bg-em/10 text-em border border-em/20' : 'text-stone-2 hover:bg-ink-5 hover:text-slate-900 border border-transparent'}`}
             >
               <div className="text-2xs font-mono uppercase tracking-[0.18em] opacity-80">{tab.icon}</div>
               <div className="mt-1 font-semibold">{tab.label}</div>
@@ -569,7 +748,7 @@ export default function Settings() {
 
       <div className="flex-1 overflow-y-auto p-6">
         <div className="mb-6">
-          <h2 className="font-display text-2xl font-bold text-white">{TABS.find((tab) => tab.id === activeTab)?.label}</h2>
+          <h2 className="font-display text-2xl font-bold text-slate-900">{TABS.find((tab) => tab.id === activeTab)?.label}</h2>
           <p className="mt-1 text-sm text-stone-2">{headerCopy}</p>
         </div>
 
@@ -587,16 +766,16 @@ export default function Settings() {
           {activeTab === 'bot' ? <BotTab business={business} services={botPreview?.services || services} botPreview={botPreview} onSave={(payload) => saveMut.mutate(payload)} /> : null}
           {activeTab === 'team' ? (
             <div className="card p-6">
-              <h3 className="font-display font-bold text-base text-white mb-4">Team Members</h3>
+              <h3 className="font-display font-bold text-base text-slate-900 mb-4">Team Members</h3>
               {staff.length ? (
                 <div className="space-y-3">
                   {staff.map((member) => (
                     <div key={member._id} className="flex items-center gap-3 rounded-2xl border border-ink-6 bg-ink-3 p-4">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white" style={{ background: `${member.color || '#00E676'}30` }}>
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-slate-900" style={{ background: `${member.color || '#00E676'}30` }}>
                         {member.name?.[0]?.toUpperCase()}
                       </div>
                       <div className="flex-1">
-                        <div className="text-sm font-semibold text-white">{member.name}</div>
+                        <div className="text-sm font-semibold text-slate-900">{member.name}</div>
                         <div className="text-2xs text-stone-2 mt-1">{member.role} · {member.email || member.phone || 'No contact info'}</div>
                       </div>
                       <DeliveryBadge status={member.isActive ? 'delivered' : 'failed'} />
@@ -606,9 +785,17 @@ export default function Settings() {
               ) : <div className="text-sm text-stone-2">No team members yet. Add staff to assign appointments later.</div>}
             </div>
           ) : null}
-          {activeTab === 'billing' ? <BillingTab business={business} /> : null}
+          {activeTab === 'billing' ? (
+            <BillingTab
+              business={business}
+              isOwner={user?.role === 'owner'}
+              onLicenseUpdate={(payload) => saveLicenseMut.mutate(payload)}
+              isSavingLicense={saveLicenseMut.isPending}
+            />
+          ) : null}
         </motion.div>
       </div>
     </div>
   );
 }
+

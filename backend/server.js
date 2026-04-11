@@ -13,7 +13,7 @@ dotenv.config({ path: require('path').resolve(__dirname, '.env') });
 console.log('VERIFY TOKEN:', process.env.WA_VERIFY_TOKEN); // ← Add this
 console.log('NODE ENV:', process.env.NODE_ENV); // ← Add this
 // Route imports
-const authRoutes = require('./routes/auth');
+const authRoutes = require('./routes/auth_v2');
 const appointmentRoutes = require('./routes/appointments');
 const contactRoutes = require('./routes/contacts');
 const staffRoutes = require('./routes/staff');
@@ -23,6 +23,7 @@ const webhookRoutes = require('./routes/webhook');
 const settingsRoutes = require('./routes/settings');
 const chatRoutes = require('./routes/chat');
 const notificationRoutes = require('./routes/notifications');
+const platformRoutes = require('./routes/platform_v2');
 
 const { errorHandler } = require('./middleware/errorHandler');
 const logger = require('./utils/logger');
@@ -88,6 +89,7 @@ app.use('/api/v1/webhook', webhookRoutes);
 app.use('/api/v1/settings', settingsRoutes);
 app.use('/api/v1/chat', chatRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
+app.use('/api/v1/platform', platformRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

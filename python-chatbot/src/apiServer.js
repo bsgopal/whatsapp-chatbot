@@ -9,14 +9,46 @@ const businesses = require("../data/businesses");
 
 let currentQR  = null;
 let botStatus  = "loading";
+let currentPairingCode = null;
+let pairingError = null;
+let runtimeError = null;
+let requestPairingCodeHandler = null;
+let logoutHandler = null;
 
-function setQR(qr)        { currentQR = qr;   botStatus = "qr_ready";     }
-function setConnected()   { currentQR = null;  botStatus = "connected";    }
-function setDisconnected(){ botStatus = "disconnected"; }
+function setQR(qr) {
+  currentQR = qr;
+  runtimeError = null;
+  botStatus = "qr_ready";
+}
+function setConnected()   { currentQR = null; currentPairingCode = null; pairingError = null; runtimeError = null; botStatus = "connected"; }
+function setDisconnected(message = null){
+  currentQR = null;
+  currentPairingCode = null;
+  pairingError = null;
+  if (message) runtimeError = message;
+  botStatus = "disconnected";
+}
+function setLoading(message = null) {
+  currentQR = null;
+  currentPairingCode = null;
+  pairingError = null;
+  runtimeError = message;
+  botStatus = "loading";
+}
+function setPairingCode(code) { currentPairingCode = code; pairingError = null; }
+function setPairingError(message) { pairingError = message; currentPairingCode = null; }
+function setRuntimeError(message) {
+  runtimeError = message;
+  currentQR = null;
+  currentPairingCode = null;
+  botStatus = "error";
+}
+function registerPairingCodeHandler(handler) { requestPairingCodeHandler = handler; }
+function registerLogoutHandler(handler) { logoutHandler = handler; }
 
 function cors(res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, DELETE, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   res.setHeader("Content-Type", "application/json");
 }
@@ -36,10 +68,54 @@ function start() {
     try {
       // ── QR status ───────────────────────────────────────────
       if (url === "/api/qr-status") {
-        return send(res, 200, { status: botStatus, qr: currentQR });
+        return send(res, 200, {
+          status: botStatus,
+          qr: currentQR,
+          pairingCode: currentPairingCode,
+          pairingError,
+          runtimeError,
+        });
+      }
+
+      if (url === "/api/pairing-code" && req.method === "POST") {
+        if (!requestPairingCodeHandler) {
+          return send(res, 503, { error: "Pairing code handler is not available" });
+        }
+
+        let body = "";
+        req.on("data", (chunk) => { body += chunk; });
+        req.on("end", async () => {
+          try {
+            const payload = body ? JSON.parse(body) : {};
+            const phoneNumber = String(payload.phoneNumber || "").replace(/\D/g, "");
+            if (!phoneNumber) {
+              return send(res, 400, { error: "Phone number is required in international format" });
+            }
+
+            const code = await requestPairingCodeHandler(phoneNumber);
+            setPairingCode(code);
+            return send(res, 200, { success: true, pairingCode: code });
+          } catch (err) {
+            setPairingError(err.message || "Failed to request pairing code");
+            return send(res, 500, { error: err.message || "Failed to request pairing code" });
+          }
+        });
+        return;
       }
 
       // ── All appointments (flat list) ────────────────────────
+      if (url === "/api/logout" && req.method === "POST") {
+        if (!logoutHandler) {
+          return send(res, 503, { error: "Logout handler is not available" });
+        }
+
+        const result = await logoutHandler();
+        return send(res, 200, {
+          success: true,
+          ...(result || {}),
+        });
+      }
+
       if (url === "/api/appointments") {
         const all = Object.values(await store.getAll()).flat();
         // sort newest first
@@ -101,9 +177,31 @@ function start() {
     }
   });
 
-  server.listen(3001, () => {
-    console.log("📊  Admin API → http://localhost:3001");
+  return new Promise((resolve, reject) => {
+    server.once("error", (err) => {
+      if (err.code === "EADDRINUSE") {
+        reject(new Error("Port 3001 is already in use. Stop the old WhatsApp bot process and try again."));
+        return;
+      }
+      reject(err);
+    });
+
+    server.listen(3001, () => {
+      console.log("📊  Admin API → http://localhost:3001");
+      resolve(server);
+    });
   });
 }
 
-module.exports = { start, setQR, setConnected, setDisconnected };
+module.exports = {
+  start,
+  setQR,
+  setConnected,
+  setDisconnected,
+  setLoading,
+  setPairingCode,
+  setPairingError,
+  setRuntimeError,
+  registerPairingCodeHandler,
+  registerLogoutHandler,
+};

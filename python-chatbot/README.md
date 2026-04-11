@@ -35,7 +35,7 @@ npm install
 
 ### 3. Start the bot
 ```bash
-node src/bot.js
+npm start
 ```
 
 ### 4. Scan QR Code

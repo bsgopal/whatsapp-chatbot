@@ -12,7 +12,6 @@ const useAuthStore = create((set, get) => ({
   login: async (phone, password) => {
     set({ isLoading: true });
     try {
-      // strip non-digits, keep last 10 digits
       const normalizedPhone = String(phone).replace(/\D/g, '').slice(-10);
       const { data } = await authAPI.login({ phone: normalizedPhone, password });
       localStorage.setItem('wa_token', data.token);

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -8,7 +8,7 @@ import { useSocket } from '../../hooks/useSocket';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 
-const NAV = [
+const DEFAULT_NAV = [
   { path: '/', label: 'Dashboard', icon: '⊞', exact: true },
   { path: '/appointments', label: 'Appointments', icon: '📅' },
   { path: '/contacts', label: 'Contacts', icon: '👥' },
@@ -20,20 +20,27 @@ const NAV = [
   { path: '/settings', label: 'Settings', icon: '⚙️' },
 ];
 
+const PLATFORM_NAV = [
+  { path: '/platform', label: 'Clients', icon: '🏢' },
+];
+
 export default function AppShell() {
   const { user, business, logout } = useAuthStore();
   const navigate = useNavigate();
   const [showNotifs, setShowNotifs] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const navItems = useMemo(() => (user?.role === 'super_admin' ? PLATFORM_NAV : DEFAULT_NAV), [user?.role]);
 
   const { data: notifsData, refetch: refetchNotifs } = useQuery({
     queryKey: ['notifications'],
     queryFn: () => notificationsAPI.getAll({ limit: 10 }),
     select: (d) => d.data,
     refetchInterval: 30000,
+    enabled: user?.role !== 'super_admin',
   });
 
   useSocket((event, data) => {
+    if (user?.role === 'super_admin') return;
     if (event === 'new_appointment') {
       toast.success(`New appointment booked!`, { icon: '📅' });
       refetchNotifs();
@@ -59,24 +66,24 @@ export default function AppShell() {
         <div className="flex items-center gap-2.5 px-4 py-4 border-b border-ink-6 min-h-[60px]">
           <div
             className="w-8 h-8 rounded-lg bg-gradient-to-br from-em to-teal flex items-center justify-center text-sm flex-shrink-0 cursor-pointer"
-            style={{ animation: 'gemPulse 4s ease-in-out infinite', boxShadow: '0 0 0 1px rgba(0,230,118,.35), 0 4px 20px rgba(0,230,118,.18)' }}
+            style={{ animation: 'gemPulse 4s ease-in-out infinite', boxShadow: '0 0 0 1px rgba(37,99,235,.35), 0 4px 20px rgba(37,99,235,.18)' }}
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
           >
             📱
           </div>
           {!sidebarCollapsed && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <div className="font-display font-bold text-sm text-white leading-tight">WA Appt OS</div>
+              <div className="font-display font-bold text-sm text-slate-900 leading-tight">WA Appt OS</div>
               <div className="text-2xs font-mono font-semibold text-em tracking-wider">ENTERPRISE</div>
             </motion.div>
           )}
         </div>
 
         {/* Business badge */}
-        {!sidebarCollapsed && business && (
+        {!sidebarCollapsed && business && user?.role !== 'super_admin' && (
           <div className="mx-3 mt-3 mb-1 px-3 py-2 rounded-lg bg-ink-4 border border-ink-6">
             <div className="text-2xs text-stone-2 font-mono uppercase tracking-wider mb-0.5">Business</div>
-            <div className="text-xs font-semibold text-white truncate">{business.name}</div>
+            <div className="text-xs font-semibold text-slate-900 truncate">{business.name}</div>
             <div className="flex items-center gap-1.5 mt-1">
               <span className="w-1.5 h-1.5 rounded-full bg-em dot-pulse flex-shrink-0" />
               <span className="text-2xs text-stone-2 capitalize">{business.subscription?.plan || 'starter'} plan</span>
@@ -86,7 +93,7 @@ export default function AppShell() {
 
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-0.5">
-          {NAV.map(({ path, label, icon, exact }) => (
+          {navItems.map(({ path, label, icon, exact }) => (
             <NavLink
               key={path}
               to={path}
@@ -94,7 +101,7 @@ export default function AppShell() {
               className={({ isActive }) =>
                 isActive
                   ? 'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold bg-em/10 text-em cursor-pointer border-l-2 border-em'
-                  : 'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-stone-2 hover:bg-ink-5 hover:text-white cursor-pointer transition-colors'
+                  : 'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-stone-2 hover:bg-ink-5 hover:text-slate-900 cursor-pointer transition-colors'
               }
             >
               <span className="text-base flex-shrink-0 w-5 text-center">{icon}</span>
@@ -107,11 +114,11 @@ export default function AppShell() {
         <div className="p-3 border-t border-ink-6">
           {!sidebarCollapsed ? (
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet to-sky flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet to-sky flex items-center justify-center text-xs font-bold text-slate-900 flex-shrink-0">
                 {user?.name?.[0]?.toUpperCase() || 'U'}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-xs font-semibold text-white truncate">{user?.name}</div>
+                <div className="text-xs font-semibold text-slate-900 truncate">{user?.name}</div>
                 <div className="text-2xs text-stone-2 capitalize">{user?.role}</div>
               </div>
               <button onClick={logout} className="text-stone-2 hover:text-rose transition-colors p-1 rounded" title="Logout">
@@ -140,7 +147,7 @@ export default function AppShell() {
           <div className="flex-1" />
 
           {/* WhatsApp status */}
-          {business?.whatsapp?.isConnected && (
+          {user?.role !== 'super_admin' && business?.whatsapp?.isConnected && (
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-em/10 border border-em/30">
               <span className="w-1.5 h-1.5 rounded-full bg-em dot-pulse" />
               <span className="text-2xs font-semibold text-em font-mono">{business.whatsapp.connectedPhone}</span>
@@ -155,7 +162,7 @@ export default function AppShell() {
             >
               🔔
               {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose text-white text-2xs font-bold flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose text-slate-900 text-2xs font-bold flex items-center justify-center">
                   {unreadCount > 9 ? '9+' : unreadCount}
                 </span>
               )}
@@ -171,7 +178,7 @@ export default function AppShell() {
                   className="absolute right-0 top-10 w-80 bg-ink-3 border border-ink-7 rounded-xl shadow-xl z-50 overflow-hidden"
                 >
                   <div className="flex items-center justify-between px-4 py-3 border-b border-ink-6">
-                    <span className="font-display font-bold text-sm text-white">Notifications</span>
+                    <span className="font-display font-bold text-sm text-slate-900">Notifications</span>
                     <button
                       onClick={() => { notificationsAPI.markAllRead(); refetchNotifs(); }}
                       className="text-2xs text-em hover:underline"
@@ -188,7 +195,7 @@ export default function AppShell() {
                           {n.icon || '📌'}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="text-xs font-semibold text-white">{n.title}</div>
+                          <div className="text-xs font-semibold text-slate-900">{n.title}</div>
                           <div className="text-2xs text-stone-2 mt-0.5">{n.message}</div>
                           <div className="text-2xs font-mono text-stone-1 mt-1">{format(new Date(n.createdAt), 'MMM d, h:mm a')}</div>
                         </div>
@@ -202,7 +209,7 @@ export default function AppShell() {
           </div>
 
           {/* Avatar */}
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet to-sky flex items-center justify-center text-xs font-bold text-white cursor-pointer" onClick={() => navigate('/settings')}>
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet to-sky flex items-center justify-center text-xs font-bold text-slate-900 cursor-pointer" onClick={() => navigate(user?.role === 'super_admin' ? '/platform' : '/settings')}>
             {user?.name?.[0]?.toUpperCase() || 'U'}
           </div>
         </header>
@@ -215,3 +222,4 @@ export default function AppShell() {
     </div>
   );
 }
+

@@ -2,6 +2,7 @@
   "name": "wa-appt-os-frontend",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "dependencies": {
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.18",
@@ -32,3 +33,4 @@
     "preview": "vite preview"
   }
 }
+

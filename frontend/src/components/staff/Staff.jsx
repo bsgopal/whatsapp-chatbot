@@ -45,7 +45,7 @@ function StaffModal({ staff, services, onClose }) {
         className="card p-7 w-full max-w-lg max-h-[90vh] overflow-y-auto"
         onClick={e => e.stopPropagation()}
       >
-        <h2 className="font-display font-extrabold text-xl text-white mb-5">{isEdit ? 'Edit Staff Member' : 'Add Staff Member'}</h2>
+        <h2 className="font-display font-extrabold text-xl text-slate-900 mb-5">{isEdit ? 'Edit Staff Member' : 'Add Staff Member'}</h2>
 
         <div className="space-y-4">
           {/* Basic info */}
@@ -100,7 +100,7 @@ function StaffModal({ staff, services, onClose }) {
               {DAYS.map(d => (
                 <button key={d} onClick={() => toggleDay(d)}
                   className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all border ${
-                    form.workingDays.includes(d) ? 'bg-em/10 border-em/30 text-em' : 'bg-ink-5 border-ink-7 text-stone-2 hover:text-white'
+                    form.workingDays.includes(d) ? 'bg-em/10 border-em/30 text-em' : 'bg-ink-5 border-ink-7 text-stone-2 hover:text-slate-900'
                   }`}>
                   {d.slice(0,3).toUpperCase()}
                 </button>
@@ -116,7 +116,7 @@ function StaffModal({ staff, services, onClose }) {
                 {services.map(s => (
                   <button key={s._id} onClick={() => toggleService(s._id)}
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
-                      form.services.includes(s._id) ? 'bg-em/10 border-em/30 text-em' : 'bg-ink-5 border-ink-7 text-stone-2 hover:text-white'
+                      form.services.includes(s._id) ? 'bg-em/10 border-em/30 text-em' : 'bg-ink-5 border-ink-7 text-stone-2 hover:text-slate-900'
                     }`}>
                     {s.name}
                   </button>
@@ -172,7 +172,7 @@ export default function Staff() {
     <div className="h-full flex flex-col overflow-hidden">
       <div className="topbar flex-shrink-0">
         <div>
-          <h1 className="font-display font-extrabold text-xl text-white">Staff Management</h1>
+          <h1 className="font-display font-extrabold text-xl text-slate-900">Staff Management</h1>
           <p className="text-xs text-stone-2 mt-0.5">{staff.length} team members</p>
         </div>
         <button className="btn-em" onClick={() => setModal('add')}>+ Add Staff</button>
@@ -201,13 +201,13 @@ export default function Staff() {
               >
                 {/* Header */}
                 <div className="flex items-start gap-3 mb-4">
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold text-white flex-shrink-0 shadow-lg"
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold text-slate-900 flex-shrink-0 shadow-lg"
                     style={{ background: `linear-gradient(135deg, ${s.color || '#00E676'}40, ${s.color || '#00E676'}20)`, border: `1.5px solid ${s.color || '#00E676'}40` }}>
                     {s.name?.[0]?.toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-bold text-white truncate">{s.name}</h3>
+                      <h3 className="text-sm font-bold text-slate-900 truncate">{s.name}</h3>
                       <span className={`w-2 h-2 rounded-full flex-shrink-0 ${s.isActive ? 'bg-em' : 'bg-stone-2'}`} />
                     </div>
                     <div className="text-2xs text-stone-2 mt-0.5">{s.role}</div>
@@ -246,7 +246,7 @@ export default function Staff() {
                   {DAYS.map(d => (
                     <div key={d}
                       className={`w-6 h-6 rounded flex items-center justify-center text-2xs font-bold ${
-                        s.workingDays?.includes(d) ? 'text-white' : 'text-stone-1 bg-ink-6'
+                        s.workingDays?.includes(d) ? 'text-slate-900' : 'text-stone-1 bg-ink-6'
                       }`}
                       style={s.workingDays?.includes(d) ? { background: `${s.color || '#00E676'}30`, color: s.color || '#00E676' } : {}}>
                       {d[0].toUpperCase()}
@@ -286,3 +286,4 @@ export default function Staff() {
     </div>
   );
 }
+

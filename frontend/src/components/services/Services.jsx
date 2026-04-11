@@ -43,7 +43,7 @@ function ServiceModal({ service, onClose }) {
         className="card p-7 w-full max-w-lg max-h-[90vh] overflow-y-auto"
         onClick={e => e.stopPropagation()}
       >
-        <h2 className="font-display font-extrabold text-xl text-white mb-5">{isEdit ? 'Edit Service' : 'Create Service'}</h2>
+        <h2 className="font-display font-extrabold text-xl text-slate-900 mb-5">{isEdit ? 'Edit Service' : 'Create Service'}</h2>
 
         <div className="space-y-4">
           <div>
@@ -146,7 +146,7 @@ export default function Services() {
     <div className="h-full flex flex-col overflow-hidden">
       <div className="topbar flex-shrink-0">
         <div>
-          <h1 className="font-display font-extrabold text-xl text-white">Services</h1>
+          <h1 className="font-display font-extrabold text-xl text-slate-900">Services</h1>
           <p className="text-xs text-stone-2 mt-0.5">{allServices.length} services · ₹{totalRevenue.toLocaleString()} total revenue</p>
         </div>
         <button className="btn-em" onClick={() => setModal('add')}>+ Create Service</button>
@@ -156,12 +156,12 @@ export default function Services() {
       {cats.length > 0 && (
         <div className="flex items-center gap-2 px-6 py-3 bg-ink-2 border-b border-ink-6 flex-shrink-0 overflow-x-auto">
           <button onClick={() => setFilterCat('')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap ${!filterCat ? 'bg-em/10 text-em border border-em/30' : 'bg-ink-4 border border-ink-6 text-stone-2 hover:text-white'}`}>
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap ${!filterCat ? 'bg-em/10 text-em border border-em/30' : 'bg-ink-4 border border-ink-6 text-stone-2 hover:text-slate-900'}`}>
             All ({allServices.length})
           </button>
           {cats.map(c => (
             <button key={c} onClick={() => setFilterCat(c === filterCat ? '' : c)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap ${filterCat === c ? 'bg-em/10 text-em border border-em/30' : 'bg-ink-4 border border-ink-6 text-stone-2 hover:text-white'}`}>
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap ${filterCat === c ? 'bg-em/10 text-em border border-em/30' : 'bg-ink-4 border border-ink-6 text-stone-2 hover:text-slate-900'}`}>
               {c} ({allServices.filter(s => s.category === c).length})
             </button>
           ))}
@@ -196,7 +196,7 @@ export default function Services() {
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 mb-1">
-                      <h3 className="text-sm font-bold text-white truncate">{svc.name}</h3>
+                      <h3 className="text-sm font-bold text-slate-900 truncate">{svc.name}</h3>
                       {svc.isPopular && <span className="text-amber text-xs" title="Popular">⭐</span>}
                     </div>
                     {svc.category && (
@@ -226,7 +226,7 @@ export default function Services() {
                 {/* Stats */}
                 <div className="grid grid-cols-2 gap-2 p-2.5 bg-ink-5 rounded-lg border border-ink-6 mb-4 text-center">
                   <div>
-                    <div className="font-mono font-bold text-xs text-white">{svc.bookingsCount || 0}</div>
+                    <div className="font-mono font-bold text-xs text-slate-900">{svc.bookingsCount || 0}</div>
                     <div className="text-2xs text-stone-2">Bookings</div>
                   </div>
                   <div>
@@ -265,3 +265,4 @@ export default function Services() {
     </div>
   );
 }
+

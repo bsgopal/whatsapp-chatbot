@@ -36,7 +36,7 @@ function StatCard({ icon, label, value, sub, color = '#00E676', delay = 0 }) {
         )}
       </div>
       <div>
-        <div className="font-display font-extrabold text-2xl text-white">{value}</div>
+        <div className="font-display font-extrabold text-2xl text-slate-900">{value}</div>
         <div className="text-xs text-stone-2 mt-0.5">{label}</div>
       </div>
     </motion.div>
@@ -94,7 +94,7 @@ export default function Dashboard() {
     <div className="h-full overflow-y-auto bg-ink-1 p-6">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="font-display font-extrabold text-2xl text-white">
+        <h1 className="font-display font-extrabold text-2xl text-slate-900">
           Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'}, {user?.name?.split(' ')[0]} 👋
         </h1>
         <p className="text-sm text-stone-2 mt-1">
@@ -120,7 +120,7 @@ export default function Dashboard() {
         >
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="font-display font-bold text-sm text-white">30-Day Trend</h3>
+              <h3 className="font-display font-bold text-sm text-slate-900">30-Day Trend</h3>
               <p className="text-2xs text-stone-2">Appointments & Revenue</p>
             </div>
             <span className="badge-em">Last 30 days</span>
@@ -137,7 +137,7 @@ export default function Dashboard() {
                   <stop offset="100%" stopColor="#38BDF8" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <XAxis dataKey="date" tick={{ fill: '#617484', fontSize: 10, fontFamily: 'JetBrains Mono' }} axisLine={false} tickLine={false} />
+              <XAxis dataKey="date" tick={{ fill: '#617484', fontSize: 10, fontFamily: 'IBM Plex Mono' }} axisLine={false} tickLine={false} />
               <YAxis hide />
               <Tooltip content={<CustomTooltip />} />
               <Area type="monotone" dataKey="count" name="appointments" stroke="#00E676" strokeWidth={2} fill="url(#countGrad)" />
@@ -152,7 +152,7 @@ export default function Dashboard() {
           transition={{ delay: 0.25 }}
           className="card p-5"
         >
-          <h3 className="font-display font-bold text-sm text-white mb-4">Top Services</h3>
+          <h3 className="font-display font-bold text-sm text-slate-900 mb-4">Top Services</h3>
           {topServices.length === 0 ? (
             <p className="text-sm text-stone-2 text-center py-8">No data yet</p>
           ) : (
@@ -161,7 +161,7 @@ export default function Dashboard() {
                 <div key={i}>
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs text-mist-2 truncate flex-1">{s._id || 'Unknown'}</span>
-                    <span className="text-xs font-bold text-white ml-2">{s.count}</span>
+                    <span className="text-xs font-bold text-slate-900 ml-2">{s.count}</span>
                   </div>
                   <div className="w-full bg-ink-5 rounded-full h-1.5">
                     <div
@@ -185,7 +185,7 @@ export default function Dashboard() {
       >
         <div className="flex items-center justify-between px-5 py-4 border-b border-ink-6">
           <div className="flex items-center gap-2">
-            <span className="font-display font-bold text-sm text-white">Today's Schedule</span>
+            <span className="font-display font-bold text-sm text-slate-900">Today's Schedule</span>
             {today.length > 0 && (
               <span className="badge-em">{today.length} apts</span>
             )}
@@ -212,23 +212,23 @@ export default function Dashboard() {
                 >
                   {/* Time */}
                   <div className="w-14 flex-shrink-0 text-center">
-                    <div className="text-xs font-mono font-bold text-white">{format(new Date(apt.scheduledAt), 'HH:mm')}</div>
+                    <div className="text-xs font-mono font-bold text-slate-900">{format(new Date(apt.scheduledAt), 'HH:mm')}</div>
                     <div className="text-2xs text-stone-2 font-mono">{apt.serviceDuration}m</div>
                   </div>
 
                   {/* Avatar */}
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet/50 to-sky/50 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet/50 to-sky/50 flex items-center justify-center text-xs font-bold text-slate-900 flex-shrink-0">
                     {apt.contact?.name?.[0]?.toUpperCase() || '?'}
                   </div>
 
                   {/* Info */}
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-semibold text-white truncate">{apt.contact?.name}</div>
+                    <div className="text-sm font-semibold text-slate-900 truncate">{apt.contact?.name}</div>
                     <div className="text-2xs text-stone-2 truncate">{apt.serviceName} {apt.staff ? `· ${apt.staff.name}` : ''}</div>
                   </div>
 
                   {/* Price */}
-                  <div className="text-xs font-mono font-bold text-white mr-2">₹{(apt.servicePrice || 0).toLocaleString()}</div>
+                  <div className="text-xs font-mono font-bold text-slate-900 mr-2">₹{(apt.servicePrice || 0).toLocaleString()}</div>
 
                   {/* Status */}
                   <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-bold border ${st.bg}`}>
@@ -253,7 +253,7 @@ export default function Dashboard() {
         transition={{ delay: 0.35 }}
         className="card p-5 mt-4"
       >
-        <h3 className="font-display font-bold text-sm text-white mb-4">WhatsApp KPIs</h3>
+        <h3 className="font-display font-bold text-sm text-slate-900 mb-4">WhatsApp KPIs</h3>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
           {[
             { l: 'Delivery Rate', v: `${chatbotKpis.deliveryRate ?? 0}%`, c: 'text-em' },
@@ -272,3 +272,4 @@ export default function Dashboard() {
     </div>
   );
 }
+

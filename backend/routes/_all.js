@@ -6,6 +6,7 @@ const { protect } = require('../middleware/auth');
 const { AppError } = require('../middleware/errorHandler');
 const Appointment = require('../models/Appointment');
 const logger = require('../utils/logger');
+const { createAuditLog } = require('../utils/audit');
 
 staffRouter.use(protect);
 
@@ -92,6 +93,15 @@ settingsRouter.put('/', async (req, res, next) => {
     const updates = {};
     allowed.forEach(k => { if (req.body[k] !== undefined) updates[k] = req.body[k]; });
     const business = await Business.findByIdAndUpdate(req.user.business, updates, { new: true });
+    await createAuditLog({
+      actor: req.user,
+      business: req.user.business,
+      scope: 'client',
+      action: 'settings.updated',
+      title: 'Business settings updated',
+      description: `${req.user.name} updated business settings.`,
+      metadata: { updatedFields: Object.keys(updates) },
+    });
     res.json({ success: true, data: business });
   } catch (err) { next(err); }
 });
@@ -104,7 +114,100 @@ settingsRouter.put('/whatsapp', async (req, res, next) => {
       { whatsapp: { phoneNumberId, wabaId, accessToken, verifyToken, webhookUrl: `${process.env.CLIENT_URL}/api/v1/webhook/whatsapp` } },
       { new: true }
     );
+    await createAuditLog({
+      actor: req.user,
+      business: req.user.business,
+      scope: 'client',
+      action: 'settings.whatsapp.updated',
+      title: 'WhatsApp settings updated',
+      description: `${req.user.name} updated WhatsApp Cloud API settings.`,
+      metadata: {
+        phoneNumberId,
+        verifyToken,
+      },
+    });
     res.json({ success: true, data: business });
+  } catch (err) { next(err); }
+});
+
+function generateLicenseKey() {
+  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const block = () => Array.from({ length: 4 }, () => alphabet[Math.floor(Math.random() * alphabet.length)]).join('');
+  return `WA-${block()}-${block()}`;
+}
+
+settingsRouter.put('/license', async (req, res, next) => {
+  try {
+    if (req.user.role !== 'owner') {
+      return next(new AppError('Only the workspace owner can manage the license from settings', 403));
+    }
+
+    const {
+      durationValue,
+      durationUnit = 'day',
+      status,
+      notes,
+      plan,
+    } = req.body;
+
+    const business = await Business.findById(req.user.business);
+    if (!business) return next(new AppError('Business not found', 404));
+
+    const now = new Date();
+    const currentEnd = business.license?.endAt ? new Date(business.license.endAt) : null;
+    const startAt = currentEnd && currentEnd > now ? currentEnd : now;
+    const updates = {};
+
+    if (!business.license?.key) {
+      updates['license.key'] = generateLicenseKey();
+      updates['license.generatedAt'] = now;
+    }
+
+    if (durationValue) {
+      const safeDurationValue = Math.max(1, Number(durationValue) || 1);
+      const safeDurationUnit = durationUnit === 'month' ? 'month' : 'day';
+      const endAt = addDuration(startAt, safeDurationValue, safeDurationUnit);
+      const durationDays = Math.max(1, Math.ceil((endAt.getTime() - startAt.getTime()) / (24 * 60 * 60 * 1000)));
+
+      updates['license.startAt'] = startAt;
+      updates['license.endAt'] = endAt;
+      updates['license.lastPaymentAt'] = now;
+      updates['license.lastDurationDays'] = durationDays;
+      updates['license.lastDurationValue'] = safeDurationValue;
+      updates['license.lastDurationUnit'] = safeDurationUnit;
+      updates['license.status'] = 'active';
+      updates['subscription.currentPeriodStart'] = startAt;
+      updates['subscription.currentPeriodEnd'] = endAt;
+      updates['subscription.status'] = 'active';
+    }
+
+    if (status) {
+      updates['license.status'] = status;
+      if (status === 'expired') updates['subscription.status'] = 'expired';
+      if (status === 'suspended') updates['subscription.status'] = 'inactive';
+    }
+
+    if (notes !== undefined) updates['license.notes'] = notes;
+    if (plan) updates['subscription.plan'] = plan;
+
+    const updated = await Business.findByIdAndUpdate(req.user.business, { $set: updates }, { new: true }).lean();
+
+    await createAuditLog({
+      actor: req.user,
+      business: req.user.business,
+      scope: 'client',
+      action: 'license.updated',
+      title: 'License updated from settings',
+      description: `${req.user.name} updated the workspace license from settings.`,
+      metadata: {
+        durationValue: durationValue || null,
+        durationUnit: durationUnit || null,
+        status: status || updated.license?.status || null,
+        plan: plan || updated.subscription?.plan || null,
+      },
+    });
+
+    res.json({ success: true, data: updated });
   } catch (err) { next(err); }
 });
 
@@ -123,9 +226,9 @@ settingsRouter.get('/bot-preview', async (req, res, next) => {
       { from: 'customer', text: 'Hi' },
       { from: 'bot', text: buildServiceMenu(business, services).split('\n').slice(0, 6).join('\n') },
       { from: 'customer', text: services[0] ? '1' : 'Book appointment' },
-      { from: 'bot', text: services[0] ? `Great choice. You selected ${services[0].name}.\n\nPlease send your preferred date in YYYY-MM-DD format.` : 'Please add a service first.' },
+      { from: 'bot', text: services[0] ? `Great choice. You selected ${services[0].name}.\n\n${business?.botSettings?.datePrompt || 'Please send your preferred date in YYYY-MM-DD format.'}` : (business?.botSettings?.noServicesMessage || 'Please add a service first.') },
       { from: 'customer', text: '2026-04-07' },
-      { from: 'bot', text: 'Nice. Please send your preferred time.\nExample: 10:30 or 3 pm' },
+      { from: 'bot', text: `Nice. ${business?.botSettings?.timePrompt || 'Please send your preferred time.'}\nExample: 10:30 or 3 pm` },
     ];
 
     res.json({
@@ -277,7 +380,16 @@ chatRouter.post('/:contactId/send', async (req, res, next) => {
       failedReason,
     });
     const io = req.app.get('io');
-    if (io) io.to(`business_${req.user.business}`).emit('new_message', msg);
+    if (io) io.to(`business_${req.user.business}`).emit('new_message', {
+      ...msg.toObject(),
+      contact: {
+        _id: contact._id,
+        name: contact.name,
+        phone: contact.phone,
+        waId: contact.waId,
+        botState: contact.botState,
+      },
+    });
     if (status === 'failed') {
       return res.status(201).json({
         success: true,
@@ -353,6 +465,9 @@ async function resolveWhatsAppContact(business, rawFrom, profile) {
       phone: normalizedPhone,
       waId: normalizedPhone,
       source: 'whatsapp',
+      customerProfile: {
+        isProfileComplete: false,
+      },
     });
   } else {
     const updates = {};
@@ -388,11 +503,17 @@ function formatCurrency(amount, currency = 'INR') {
 
 function buildServiceMenu(business, services) {
   const intro = business.botSettings?.welcomeMessage || `Hello! Welcome to ${business.name}.`;
+  const menuPrompt = business.botSettings?.menuPrompt || 'Please choose a service by sending the number:';
   const lines = services.map((service, index) => (
     `${index + 1}. ${service.name} - ${formatCurrency(service.price, business.currency)} (${service.duration} mins)`
   ));
 
-  return `${intro}\n\nPlease choose a service by sending the number:\n${lines.join('\n')}\n\nYou can type "menu" anytime to restart.`;
+  return `${intro}\n\n${menuPrompt}\n${lines.join('\n')}\n\nYou can type "menu" anytime to restart.`;
+}
+
+function getBotMessage(business, key, fallback) {
+  const value = business?.botSettings?.[key];
+  return typeof value === 'string' && value.trim() ? value.trim() : fallback;
 }
 
 function parseServiceSelection(text, services) {
@@ -599,6 +720,7 @@ async function getPythonChatbotDecision({ business, contact, incomingText, servi
         phone: contact.phone,
         waId: contact.waId,
         botState: contact.botState,
+        customerProfile: contact.customerProfile,
       },
       incomingText,
       services: services.map((service) => ({
@@ -639,7 +761,16 @@ async function persistOutboundMessage({ business, contact, content, status = 'se
 
   const io = business.app?.get?.('io');
   if (io) {
-    io.to(`business_${business._id}`).emit('new_message', message);
+    io.to(`business_${business._id}`).emit('new_message', {
+      ...message.toObject(),
+      contact: {
+        _id: contact._id,
+        name: contact.name,
+        phone: contact.phone,
+        waId: contact.waId,
+        botState: contact.botState,
+      },
+    });
   }
 
   return message;
@@ -748,6 +879,12 @@ async function createBotAppointment({ app, business, contact, service, scheduled
     preferredService: service._id,
     lastVisit: scheduledAt,
     $inc: { totalAppointments: 1 },
+    customerProfile: {
+      providedName: customerName || contact.customerProfile?.providedName || contact.name,
+      isProfileComplete: true,
+      firstCapturedAt: contact.customerProfile?.firstCapturedAt || new Date(),
+      lastUpdatedAt: new Date(),
+    },
     botState: {
       stage: 'idle',
       selectedService: null,
@@ -861,7 +998,7 @@ async function handleBookingBotWithNode({ app, business, contact, incomingText, 
       app,
       business,
       contact,
-      text: `Hello! ${business.name} has no bookable services configured yet. Please contact the business directly.`,
+      text: getBotMessage(business, 'noServicesMessage', `Hello! ${business.name} has no bookable services configured yet. Please contact the business directly.`),
     });
     return;
   }
@@ -895,6 +1032,7 @@ async function handleBookingBotWithNode({ app, business, contact, incomingText, 
   }
 
   const stage = contact.botState?.stage || 'awaiting_service';
+  const savedCustomerName = contact.customerProfile?.providedName || (contact.customerProfile?.isProfileComplete ? contact.name : '');
 
   if (stage === 'awaiting_service') {
     const service = parseServiceSelection(normalized, services);
@@ -903,7 +1041,7 @@ async function handleBookingBotWithNode({ app, business, contact, incomingText, 
         app,
         business,
         contact,
-        text: `I couldn't match that service.\n\n${buildServiceMenu(business, services)}`,
+        text: `${getBotMessage(business, 'invalidServiceMessage', "I couldn't match that service. Please choose one from the menu.")}\n\n${buildServiceMenu(business, services)}`,
       });
       return;
     }
@@ -924,7 +1062,7 @@ async function handleBookingBotWithNode({ app, business, contact, incomingText, 
       app,
       business,
       contact,
-      text: `Great choice. You selected ${service.name}.\n\nPlease send your preferred date in YYYY-MM-DD format.\nExample: 2026-04-06\nYou can also type "today" or "tomorrow".`,
+      text: `Great choice. You selected ${service.name}.\n\n${business.botSettings?.datePrompt || 'Please send your preferred date in YYYY-MM-DD format.'}\nExample: 2026-04-06\nYou can also type "today" or "tomorrow".`,
     });
     return;
   }
@@ -936,7 +1074,7 @@ async function handleBookingBotWithNode({ app, business, contact, incomingText, 
         app,
         business,
         contact,
-        text: 'Please send a valid date like 2026-04-06, today, or tomorrow.',
+        text: getBotMessage(business, 'invalidDateMessage', 'Please send a valid date like 2026-04-06, today, or tomorrow.'),
       });
       return;
     }
@@ -967,7 +1105,7 @@ async function handleBookingBotWithNode({ app, business, contact, incomingText, 
       app,
       business,
       contact,
-      text: `Nice. Please send your preferred time for ${formatDateLabel(pickedDate)}.\nExample: 10:30 or 3 pm`,
+      text: `Nice. ${business.botSettings?.timePrompt || 'Please send your preferred time.'} for ${formatDateLabel(pickedDate)}.\nExample: 10:30 or 3 pm`,
     });
     return;
   }
@@ -1002,7 +1140,7 @@ async function handleBookingBotWithNode({ app, business, contact, incomingText, 
         app,
         business,
         contact,
-        text: 'Please send a valid time like 10:30, 15:00, or 3 pm.',
+        text: getBotMessage(business, 'invalidTimeMessage', 'Please send a valid time like 10:30, 15:00, or 3 pm.'),
       });
       return;
     }
@@ -1023,7 +1161,7 @@ async function handleBookingBotWithNode({ app, business, contact, incomingText, 
         app,
         business,
         contact,
-        text: `That time is outside business hours. Please choose another time between the configured opening hours.`,
+        text: getBotMessage(business, 'outOfHoursMessage', 'That time is outside business hours. Please choose another time between the configured opening hours.'),
       });
       return;
     }
@@ -1034,7 +1172,27 @@ async function handleBookingBotWithNode({ app, business, contact, incomingText, 
         app,
         business,
         contact,
-        text: 'That slot is already booked. Please send another time.',
+        text: getBotMessage(business, 'slotUnavailableMessage', 'That slot is already booked. Please send another time.'),
+      });
+      return;
+    }
+
+    if (savedCustomerName) {
+      const appointment = await createBotAppointment({
+        app,
+        business,
+        contact,
+        service: selectedService,
+        scheduledAt,
+        customerName: savedCustomerName,
+      });
+
+      await replyToContact({
+        app,
+        business,
+        contact,
+        appointmentRef: appointment._id,
+        text: `${business.botSettings?.confirmationTemplate || 'Your appointment is booked.'}\n\nName: ${savedCustomerName}\nService: ${selectedService.name}\nDate: ${formatDateLabel(selectedDate)}\nTime: ${selectedTime}\nStatus: ${appointment.status}\n\nReply "menu" if you want to make another booking.`,
       });
       return;
     }
@@ -1052,7 +1210,7 @@ async function handleBookingBotWithNode({ app, business, contact, incomingText, 
       app,
       business,
       contact,
-      text: `Slot looks available for ${selectedService.name} on ${formatDateLabel(selectedDate)} at ${selectedTime}.\n\nPlease send your name to confirm the booking.`,
+      text: `Slot looks available for ${selectedService.name} on ${formatDateLabel(selectedDate)} at ${selectedTime}.\n\n${getBotMessage(business, 'namePromptMessage', 'Please send your name to confirm the booking.')}`,
     });
     return;
   }
@@ -1096,12 +1254,20 @@ async function handleBookingBotWithNode({ app, business, contact, incomingText, 
         app,
         business,
         contact,
-        text: 'That slot was just taken. Please send another time.',
+        text: getBotMessage(business, 'slotUnavailableMessage', 'That slot was just taken. Please send another time.'),
       });
       return;
     }
 
-    const customerName = normalizeText(normalized) || contact.name;
+    const customerName = normalizeText(normalized) || contact.customerProfile?.providedName || contact.name;
+    await ContactModel.findByIdAndUpdate(contact._id, {
+      customerProfile: {
+        providedName: customerName,
+        isProfileComplete: true,
+        firstCapturedAt: contact.customerProfile?.firstCapturedAt || new Date(),
+        lastUpdatedAt: new Date(),
+      },
+    });
     const appointment = await createBotAppointment({
       app,
       business,
@@ -1116,7 +1282,7 @@ async function handleBookingBotWithNode({ app, business, contact, incomingText, 
       business,
       contact,
       appointmentRef: appointment._id,
-      text: `Your appointment is booked.\n\nName: ${customerName}\nService: ${selectedService.name}\nDate: ${formatDateLabel(selectedDate)}\nTime: ${selectedTime}\nStatus: ${appointment.status}\n\nReply "menu" if you want to make another booking.`,
+      text: `${business.botSettings?.confirmationTemplate || 'Your appointment is booked.'}\n\nName: ${customerName}\nService: ${selectedService.name}\nDate: ${formatDateLabel(selectedDate)}\nTime: ${selectedTime}\nStatus: ${appointment.status}\n\nReply "menu" if you want to make another booking.`,
     });
   }
 }
