@@ -9,6 +9,7 @@ const { handleMessage } = require("./flowHandler");
 const sessionManager = require("./sessionManager");
 const api = require("./apiServer");
 const { exposeFunctionIfAbsent } = require("whatsapp-web.js/src/util/Puppeteer");
+const { getBusiness } = require("../data/businesses");
 
 const BOT_SYNC_URL = process.env.BACKEND_URL || 'http://localhost:5000';
 const BOT_SYNC_SECRET = process.env.BOT_SYNC_SECRET || 'wa_bot_sync_secret_2024';
@@ -245,9 +246,9 @@ client.on("qr", (qr) => {
 client.on("ready", () => {
   api.setConnected();
   console.log("\n✅  Bot is LIVE!");
-  const businesses = require("../data/businesses");
-  businesses.forEach(b => console.log(`   • ${b.name}`));
-  console.log("\n💬  Send 'hi' from any WhatsApp to start.\n");
+  getBusiness()
+    .then(b => console.log(`   • ${b.name} (${b.services.length} services, ${b.staff.length} staff)\n💬  Send 'hi' from any WhatsApp to start.\n`))
+    .catch(err => console.warn("   ⚠️  Could not load business info:", err.message));
 });
 
 // ── Incoming messages ────────────────────────────────────────
@@ -261,7 +262,7 @@ client.on("message", async (msg) => {
 
   console.log(`📨  [${new Date().toLocaleTimeString()}] ${msg.from}: ${text}`);
 
-  syncToMongo('contact', { phone: msg.from, businessName: 'FitZone Gym', name: null });
+  syncToMongo('contact', { phone: msg.from, businessName: await getBusiness().then(b => b.name).catch(() => null), name: null });
 
   try {
     const reply = await handleMessage(msg.from, text);

@@ -239,7 +239,7 @@ router.post('/clients', async (req, res, next) => {
     if (!resolvedShopName) throw new AppError('Shop name is required', 400);
     if (!resolvedOwnerPhone || resolvedOwnerPhone.length !== 10) throw new AppError('A valid owner phone is required', 400);
     if (!resolvedAdminPhone || resolvedAdminPhone.length !== 10) throw new AppError('A valid admin login phone is required', 400);
-    if (!resolvedPassword || resolvedPassword.length < 8) throw new AppError('Admin password must be at least 8 characters', 400);
+    if (!resolvedPassword || resolvedPassword.length < 6) throw new AppError('Admin password must be at least 6 characters', 400);
 
     const existingUser = await User.findOne({ phone: resolvedAdminPhone });
     if (existingUser) throw new AppError('Admin login phone already belongs to another client', 400);

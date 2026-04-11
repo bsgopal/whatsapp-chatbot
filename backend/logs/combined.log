@@ -478,3 +478,17 @@
 {"level":"info","message":"MongoDB Connected: localhost","timestamp":"2026-04-11 16:18:36"}
 {"level":"info","message":"🚀 WA Appt OS Server running on port 5001 [development]","timestamp":"2026-04-11 16:18:36"}
 {"level":"info","message":"📡 Socket.IO ready","timestamp":"2026-04-11 16:18:36"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2026-04-11 16:20:04"}
+{"level":"info","message":"🚀 WA Appt OS Server running on port 5001 [development]","timestamp":"2026-04-11 16:20:04"}
+{"level":"info","message":"📡 Socket.IO ready","timestamp":"2026-04-11 16:20:04"}
+{"level":"info","message":"Socket connected: VUQLkOhwR2pjwAvrAAAB","timestamp":"2026-04-11 16:20:06"}
+{"level":"info","message":"Socket connected: ki728GFhvhqmwbcVAAAD","timestamp":"2026-04-11 16:20:06"}
+{"level":"info","message":"Socket ki728GFhvhqmwbcVAAAD joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 16:20:06"}
+{"level":"info","message":"Socket ki728GFhvhqmwbcVAAAD joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 16:20:06"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2026-04-11 16:20:13"}
+{"level":"info","message":"🚀 WA Appt OS Server running on port 5001 [development]","timestamp":"2026-04-11 16:20:14"}
+{"level":"info","message":"📡 Socket.IO ready","timestamp":"2026-04-11 16:20:14"}
+{"level":"info","message":"Socket connected: ifQvytJkLlarh37VAAAB","timestamp":"2026-04-11 16:20:14"}
+{"level":"info","message":"Socket connected: biwHSZZ1CBqRuLTnAAAD","timestamp":"2026-04-11 16:20:16"}
+{"level":"info","message":"Socket biwHSZZ1CBqRuLTnAAAD joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 16:20:16"}
+{"level":"info","message":"Socket biwHSZZ1CBqRuLTnAAAD joined room business_69d1cf7299a98f31d85e4d07","timestamp":"2026-04-11 16:20:16"}
