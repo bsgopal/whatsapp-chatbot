@@ -1,7 +1,7 @@
 // ============================================================
 //  src/bot.js  —  Entry point. Clean, no dead code.
 // ============================================================
-
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 const fs = require("fs");
 const path = require("path");
 const { Client, LocalAuth } = require("whatsapp-web.js");
@@ -11,20 +11,19 @@ const api = require("./apiServer");
 const { exposeFunctionIfAbsent } = require("whatsapp-web.js/src/util/Puppeteer");
 const { getBusiness } = require("../data/businesses");
 
-const BOT_SYNC_URL = process.env.BACKEND_URL || 'http://localhost:5000';
+const BOT_SYNC_URL = process.env.BACKEND_URL || 'http://localhost:5001';
 const BOT_SYNC_SECRET = process.env.BOT_SYNC_SECRET || 'wa_bot_sync_secret_2024';
 
 async function syncToMongo(endpoint, body) {
   try {
     const http = require('http');
-    // simple fire-and-forget POST
     const data = JSON.stringify(body);
     const url = new URL(BOT_SYNC_URL + '/api/v1/bot-sync/' + endpoint);
-    const options = { hostname: url.hostname, port: url.port || 5000, path: url.pathname, method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data), 'x-bot-secret': BOT_SYNC_SECRET } };
+    const options = { hostname: url.hostname, port: url.port || 5001, path: url.pathname, method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data), 'x-bot-secret': BOT_SYNC_SECRET } };
     const req = http.request(options);
     req.write(data);
     req.end();
-  } catch(e) { console.warn('[sync] failed:', e.message); }
+  } catch (e) { console.warn('[sync] failed:', e.message); }
 }
 
 const AUTH_CLIENT_ID = "appointment-bot";
@@ -72,6 +71,10 @@ let resettingSession = false;
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function normalizePhone(from) {
+  return String(from || '').replace(/@.*$/, '');
 }
 
 function normalizePairingPhoneNumber(phoneNumber) {
@@ -236,10 +239,10 @@ async function requestPairingCodeSafely(phoneNumber) {
   throw new Error("WhatsApp Web is not ready to generate the pairing code yet. Keep the QR visible for a few seconds, then try again.");
 }
 
-// ── QR: send to terminal AND to React via API ────────────────
+// ── QR ───────────────────────────────────────────────────────
 client.on("qr", (qr) => {
   console.log("\n📱  Scan QR with WhatsApp (or see it in the Admin Dashboard):\n");
-  api.setQR(qr);   // ← React dashboard will poll this
+  api.setQR(qr);
 });
 
 // ── Ready ────────────────────────────────────────────────────
@@ -253,16 +256,34 @@ client.on("ready", () => {
 
 // ── Incoming messages ────────────────────────────────────────
 client.on("message", async (msg) => {
-  if (msg.isGroupMsg)                  return;
+  if (msg.isGroupMsg) return;
   if (msg.from === "status@broadcast") return;
-  if (msg.type !== "chat")             return;
+  if (msg.type !== "chat") return;
 
   const text = msg.body?.trim();
   if (!text) return;
 
-  console.log(`📨  [${new Date().toLocaleTimeString()}] ${msg.from}: ${text}`);
+  // Get real phone number from WhatsApp contact info
+  const waContact = await msg.getContact();
+  const realPhone = waContact.number || normalizePhone(msg.from);
+  const businessName = await getBusiness().then(b => b.name).catch(() => null);
 
-  syncToMongo('contact', { phone: msg.from, businessName: await getBusiness().then(b => b.name).catch(() => null), name: null });
+  console.log(`📨  [${new Date().toLocaleTimeString()}] ${realPhone}: ${text}`);
+
+  // Sync contact (upsert — no duplicate if already exists)
+  syncToMongo('contact', {
+    phone: realPhone,
+    businessName,
+    name: msg.notifyName || realPhone,
+  });
+
+  // Sync inbound message → shows up in WhatsApp Inbox on dashboard
+  syncToMongo('message', {
+    phone: realPhone,
+    businessName,
+    text,
+    direction: 'inbound',
+  });
 
   try {
     const reply = await handleMessage(msg.from, text);
@@ -274,9 +295,9 @@ client.on("message", async (msg) => {
 });
 
 // ── Auth / connection events ─────────────────────────────────
-client.on("authenticated",  ()  => console.log("🔐  Authenticated!"));
-client.on("auth_failure",   ()  => console.error("❌  Auth failed. Delete .wwebjs_auth and retry."));
-client.on("disconnected",   (r) => {
+client.on("authenticated", () => console.log("🔐  Authenticated!"));
+client.on("auth_failure", () => console.error("❌  Auth failed. Delete .wwebjs_auth and retry."));
+client.on("disconnected", (r) => {
   if (resettingSession) return;
   api.setDisconnected(`WhatsApp disconnected: ${r}`);
   console.log("📵  Disconnected:", r);

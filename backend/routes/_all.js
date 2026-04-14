@@ -89,7 +89,7 @@ settingsRouter.get('/', async (req, res, next) => {
 
 settingsRouter.put('/', async (req, res, next) => {
   try {
-    const allowed = ['name','category','phone','email','address','timezone','businessHours','botSettings'];
+    const allowed = ['name', 'category', 'phone', 'email', 'address', 'timezone', 'businessHours', 'botSettings'];
     const updates = {};
     allowed.forEach(k => { if (req.body[k] !== undefined) updates[k] = req.body[k]; });
     const business = await Business.findByIdAndUpdate(req.user.business, updates, { new: true });
@@ -339,7 +339,7 @@ chatRouter.get('/:contactId/messages', async (req, res, next) => {
     const messages = await ChatMessage.find({
       business: req.user.business,
       contact: req.params.contactId,
-    }).sort({ createdAt: -1 }).skip((page-1)*parseInt(limit)).limit(parseInt(limit)).lean();
+    }).sort({ createdAt: -1 }).skip((page - 1) * parseInt(limit)).limit(parseInt(limit)).lean();
     // Mark as read
     await ChatMessage.updateMany({ business: req.user.business, contact: req.params.contactId, isRead: false }, { isRead: true });
     res.json({ success: true, data: messages.reverse() });
@@ -412,7 +412,7 @@ notifRouter.get('/', async (req, res, next) => {
     const { page = 1, limit = 20, unreadOnly } = req.query;
     const filter = { business: req.user.business };
     if (unreadOnly === 'true') filter.isRead = false;
-    const notifs = await Notification.find(filter).sort({ createdAt: -1 }).skip((page-1)*parseInt(limit)).limit(parseInt(limit));
+    const notifs = await Notification.find(filter).sort({ createdAt: -1 }).skip((page - 1) * parseInt(limit)).limit(parseInt(limit));
     const unreadCount = await Notification.countDocuments({ business: req.user.business, isRead: false });
     res.json({ success: true, data: notifs, unreadCount });
   } catch (err) { next(err); }
@@ -817,14 +817,14 @@ async function sendWhatsAppMessage(business, to, messageData) {
 
     if (!response.ok) {
       const errorBody = await response.text();
-      
+
       // Handle recipient not in allowed list error in development
       if (process.env.NODE_ENV === 'development' && errorBody.includes('Recipient phone number not in allowed list')) {
         logger.warn(`WhatsApp send skipped for development: Recipient ${normalizedTo} not in allowed list. Add to recipient list in WhatsApp Business Manager.`);
         // Return mock success for development
         return { messages: [{ id: `dev_mock_${Date.now()}` }] };
       }
-      
+
       throw new Error(`WhatsApp send failed: ${response.status} ${errorBody}`);
     }
 
@@ -1412,7 +1412,6 @@ webhookRouter.post('/whatsapp', async (req, res) => {
 
 // botSync — Sync appointments and contacts from WhatsApp bot
 const botSyncRouter = express.Router();
-const { Staff, Service } = require('../models/index');
 
 // Verify shared secret
 botSyncRouter.use((req, res, next) => {
@@ -1475,18 +1474,18 @@ botSyncRouter.post('/appointment', async (req, res) => {
         : undefined;
 
       const apptData = {
-        business:        business._id,
-        contact:         contact._id,
-        service:         serviceDoc?._id,          // ObjectId (may be null if service not in DB yet)
-        staff:           staffDoc?._id,             // ObjectId (may be null)
-        serviceName:     serviceName,               // denormalised
-        servicePrice:    servicePrice,
+        business: business._id,
+        contact: contact._id,
+        service: serviceDoc?._id,          // ObjectId (may be null if service not in DB yet)
+        staff: staffDoc?._id,             // ObjectId (may be null)
+        serviceName: serviceName,               // denormalised
+        servicePrice: servicePrice,
         serviceDuration: serviceDuration,
         scheduledAt,
         endAt,
-        status:          'confirmed',
-        source:          'whatsapp',                // valid enum value
-        notes:           `Booked via WhatsApp bot — Ref: ${bookingId}`,
+        status: 'confirmed',
+        source: 'whatsapp',                // valid enum value
+        notes: `Booked via WhatsApp bot — Ref: ${bookingId}`,
       };
 
       // service is required by schema; if we couldn't resolve it, create a
@@ -1611,7 +1610,47 @@ botSyncRouter.post('/contact', async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 });
+// Save inbound/outbound message from WhatsApp bot → shows in WhatsApp Inbox
+botSyncRouter.post('/message', async (req, res) => {
+  try {
+    const { phone, businessName, text, direction = 'inbound' } = req.body;
 
+    const business = await Business.findOne({ name: businessName });
+    if (!business) return res.status(404).json({ success: false, message: `Business not found: ${businessName}` });
+
+    const contact = await ContactModel.findOne({ business: business._id, phone });
+    if (!contact) return res.status(404).json({ success: false, message: 'Contact not found' });
+
+    const msg = await ChatMessage.create({
+      business: business._id,
+      contact: contact._id,
+      direction,
+      type: 'text',
+      content: text,
+      sentBy: direction === 'inbound' ? 'customer' : 'bot',
+      status: 'delivered',
+      isRead: false,
+    });
+
+    const io = req.app.get('io');
+    if (io) {
+      io.to(`business_${business._id}`).emit('new_message', {
+        ...msg.toObject(),
+        contact: {
+          _id: contact._id,
+          name: contact.name,
+          phone: contact.phone,
+          waId: contact.waId,
+        },
+      });
+    }
+
+    res.json({ success: true, message: msg._id });
+  } catch (err) {
+    console.error('[botSync] message error:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
 // GET /api/v1/bot-sync/business/:businessId
 // Called by the WhatsApp bot on startup to fetch its own config (staff, services, settings)
 botSyncRouter.get('/business/:businessId', async (req, res) => {
@@ -1627,25 +1666,25 @@ botSyncRouter.get('/business/:businessId', async (req, res) => {
     res.json({
       success: true,
       data: {
-        _id:          business._id,
-        name:         business.name,
-        category:     business.category,
-        currency:     business.currency || 'INR',
-        timezone:     business.timezone || 'Asia/Kolkata',
+        _id: business._id,
+        name: business.name,
+        category: business.category,
+        currency: business.currency || 'INR',
+        timezone: business.timezone || 'Asia/Kolkata',
         businessHours: business.businessHours || [],
-        botSettings:  business.botSettings || {},
+        botSettings: business.botSettings || {},
         staff: staffList.map(s => ({
-          id:   String(s._id),
+          id: String(s._id),
           name: s.name,
           role: s.role || s.specializations?.[0] || '',
           workingDays: s.workingDays || [],
-          workStart:   s.workStart || '09:00',
-          workEnd:     s.workEnd   || '18:00',
+          workStart: s.workStart || '09:00',
+          workEnd: s.workEnd || '18:00',
         })),
         services: serviceList.map(s => ({
-          id:       String(s._id),
-          name:     s.name,
-          price:    s.price,
+          id: String(s._id),
+          name: s.name,
+          price: s.price,
           duration: s.duration,
           category: s.category || '',
         })),
