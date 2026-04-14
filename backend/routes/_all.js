@@ -632,15 +632,16 @@ function isWithinBusinessHours(business, scheduledAt, duration) {
   return true;
 }
 
-async function isSlotAvailable(businessId, scheduledAt, duration) {
+async function isSlotAvailable(businessId, scheduledAt, duration, staffId = null) {
   const endAt = new Date(scheduledAt.getTime() + duration * 60000);
-  const existing = await Appointment.findOne({
+  const query = {
     business: businessId,
-    status: { $nin: ['cancelled', 'no_show'] },
+    status: { $nin: ["cancelled", "no_show"] },
     scheduledAt: { $lt: endAt },
     endAt: { $gt: scheduledAt },
-  }).lean();
-
+  };
+  if (staffId) query.staff = staffId;
+  const existing = await Appointment.findOne(query).lean();
   return !existing;
 }
 
@@ -751,7 +752,7 @@ async function getPythonChatbotDecision({ business, contact, incomingText, servi
   return response.json();
 }
 
-async function persistOutboundMessage({ business, contact, content, status = 'sent', failedReason, appointmentRef }) {
+async function persistOutboundMessage({ business, contact, content, status = 'sent', failedReason, appointmentRef, io }) {
   const message = await ChatMessage.create({
     business: business._id,
     contact: contact._id,
@@ -764,7 +765,7 @@ async function persistOutboundMessage({ business, contact, content, status = 'se
     appointmentRef,
   });
 
-  const io = business.app?.get?.('io');
+  // io is passed explicitly - business.app is never populated on a Mongoose document
   if (io) {
     io.to(`business_${business._id}`).emit('new_message', {
       ...message.toObject(),
@@ -845,22 +846,24 @@ async function sendWhatsAppMessage(business, to, messageData) {
 }
 
 async function replyToContact({ app, business, contact, text, appointmentRef, messageData }) {
+  const io = app ? app.get('io') : null;
   try {
     if (messageData && messageData.message_type === 'interactive') {
       await sendWhatsAppMessage(business, contact.waId || contact.phone, messageData);
     } else {
       await sendWhatsAppText(business, contact.waId || contact.phone, text);
     }
-    await persistOutboundMessage({ business: { ...business.toObject?.(), _id: business._id, app }, contact, content: text, appointmentRef });
+    await persistOutboundMessage({ business, contact, content: text, appointmentRef, io });
   } catch (err) {
     logger.error(`Bot reply failed for contact ${contact._id}: ${err.message}`);
     await persistOutboundMessage({
-      business: { ...business.toObject?.(), _id: business._id, app },
+      business,
       contact,
       content: text,
       status: 'failed',
       failedReason: err.message,
       appointmentRef,
+      io,
     });
   }
 }
@@ -1179,7 +1182,8 @@ async function handleBookingBotWithNode({ app, business, contact, incomingText, 
       return;
     }
 
-    const available = await isSlotAvailable(business._id, scheduledAt, selectedService.duration);
+    const selectedStaffId = contact.botState?.selectedStaff || null;
+    const available = await isSlotAvailable(business._id, scheduledAt, selectedService.duration, selectedStaffId);
     if (!available) {
       await replyToContact({
         app,
@@ -1254,7 +1258,8 @@ async function handleBookingBotWithNode({ app, business, contact, incomingText, 
     }
 
     const scheduledAt = combineDateAndTime(selectedDate, selectedTime);
-    const available = await isSlotAvailable(business._id, scheduledAt, selectedService.duration);
+    const namedStaffId = contact.botState?.selectedStaff || null;
+    const available = await isSlotAvailable(business._id, scheduledAt, selectedService.duration, namedStaffId);
     if (!available) {
       await ContactModel.findByIdAndUpdate(contact._id, {
         botState: {
@@ -1663,7 +1668,7 @@ botSyncRouter.post('/message', async (req, res) => {
       direction,
       type: 'text',
       content: text,
-      sentBy: direction === 'inbound' ? 'customer' : 'bot',
+      sentBy: direction === 'inbound' ? 'system' : 'bot',
       status: 'delivered',
       isRead: false,
     });

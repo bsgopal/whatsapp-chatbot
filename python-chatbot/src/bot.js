@@ -19,8 +19,20 @@ async function syncToMongo(endpoint, body) {
     const http = require('http');
     const data = JSON.stringify(body);
     const url = new URL(BOT_SYNC_URL + '/api/v1/bot-sync/' + endpoint);
-    const options = { hostname: url.hostname, port: url.port || 5001, path: url.pathname, method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data), 'x-bot-secret': BOT_SYNC_SECRET } };
-    const req = http.request(options);
+    const options = {
+      hostname: url.hostname,
+      port: url.port || 5001,
+      path: url.pathname,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data), 'x-bot-secret': BOT_SYNC_SECRET },
+    };
+    const req = http.request(options, (res) => {
+      res.resume(); // REQUIRED: drain response body so the socket closes cleanly
+      if (res.statusCode !== 200 && res.statusCode !== 201) {
+        console.warn(`[sync] ${endpoint} → HTTP ${res.statusCode}`);
+      }
+    });
+    req.on('error', (e) => console.warn('[sync] request error:', e.message));
     req.write(data);
     req.end();
   } catch (e) { console.warn('[sync] failed:', e.message); }
