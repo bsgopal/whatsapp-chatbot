@@ -7,7 +7,7 @@ const { v4: uuidv4 } = require("uuid");
 const storage        = require("node-persist");
 const path           = require("path");
 
-const BOT_SYNC_URL = process.env.BACKEND_URL || 'http://localhost:5000';
+const BOT_SYNC_URL = process.env.BACKEND_URL || 'http://localhost:5001';
 const BOT_SYNC_SECRET = process.env.BOT_SYNC_SECRET || 'wa_bot_sync_secret_2024';
 
 async function syncToMongo(endpoint, body) {
@@ -16,7 +16,7 @@ async function syncToMongo(endpoint, body) {
     // simple fire-and-forget POST
     const data = JSON.stringify(body);
     const url = new URL(BOT_SYNC_URL + '/api/v1/bot-sync/' + endpoint);
-    const options = { hostname: url.hostname, port: url.port || 5000, path: url.pathname, method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data), 'x-bot-secret': BOT_SYNC_SECRET } };
+    const options = { hostname: url.hostname, port: url.port || 5001, path: url.pathname, method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data), 'x-bot-secret': BOT_SYNC_SECRET } };
     const req = http.request(options);
     req.write(data);
     req.end();

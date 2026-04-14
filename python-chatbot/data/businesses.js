@@ -11,7 +11,7 @@
 const http  = require('http');
 const https = require('https');
 
-const BACKEND_URL     = (process.env.BACKEND_URL     || 'http://localhost:5000').replace(/\/+$/, '');
+const BACKEND_URL     = (process.env.BACKEND_URL     || 'http://localhost:5001').replace(/\/+$/, '');
 const BOT_SYNC_SECRET = process.env.BOT_SYNC_SECRET  || 'wa_bot_sync_secret_2024';
 const BOT_BUSINESS_ID = process.env.BOT_BUSINESS_ID  || null;
 

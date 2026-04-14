@@ -451,39 +451,44 @@ async function resolveWhatsAppContact(business, rawFrom, profile) {
     throw new Error('Invalid WhatsApp sender number');
   }
 
-  const matches = await ContactModel.find({
+  const profileName = profile?.profile?.name;
+
+  // Use findOneAndUpdate with upsert to atomically find-or-create,
+  // preventing race-condition duplicate contacts entirely.
+  let contact = await ContactModel.findOneAndUpdate(
+    { business: business._id, phone: normalizedPhone },
+    {
+      $setOnInsert: {
+        business: business._id,
+        name: profileName || rawFrom,
+        phone: normalizedPhone,
+        waId: normalizedPhone,
+        source: 'whatsapp',
+        customerProfile: { isProfileComplete: false },
+      },
+    },
+    { upsert: true, new: true, setDefaultsOnInsert: true }
+  );
+
+  // Apply any updates to existing contacts (e.g. name from WA profile)
+  const updates = {};
+  if (contact.waId !== normalizedPhone) updates.waId = normalizedPhone;
+  if (profileName && profileName !== contact.name) updates.name = profileName;
+
+  if (Object.keys(updates).length) {
+    contact = await ContactModel.findByIdAndUpdate(contact._id, updates, { new: true });
+  }
+
+  // Merge any leftover duplicates that may have existed before this fix
+  const duplicates = await ContactModel.find({
     business: business._id,
-    $or: [{ waId: normalizedPhone }, { phone: normalizedPhone }],
+    phone: normalizedPhone,
+    _id: { $ne: contact._id },
   }).sort({ createdAt: 1 });
 
-  let contact = matches[0];
-
-  if (!contact) {
-    contact = await ContactModel.create({
-      business: business._id,
-      name: profile?.profile?.name || rawFrom,
-      phone: normalizedPhone,
-      waId: normalizedPhone,
-      source: 'whatsapp',
-      customerProfile: {
-        isProfileComplete: false,
-      },
-    });
-  } else {
-    const updates = {};
-    if (contact.waId !== normalizedPhone) updates.waId = normalizedPhone;
-    if (contact.phone !== normalizedPhone) updates.phone = normalizedPhone;
-    if (profile?.profile?.name && profile.profile.name !== contact.name) updates.name = profile.profile.name;
-
-    if (Object.keys(updates).length) {
-      await ContactModel.findByIdAndUpdate(contact._id, updates, { new: true });
-    }
-
-    for (let i = 1; i < matches.length; i += 1) {
-      const duplicate = matches[i];
-      await ChatMessage.updateMany({ contact: duplicate._id }, { contact: contact._id });
-      await ContactModel.findByIdAndDelete(duplicate._id);
-    }
+  for (const duplicate of duplicates) {
+    await ChatMessage.updateMany({ contact: duplicate._id }, { contact: contact._id });
+    await ContactModel.findByIdAndDelete(duplicate._id);
   }
 
   return contact;
@@ -968,8 +973,13 @@ async function handleBookingBotWithPython({ app, business, contact, incomingText
       customerName: decision.create_appointment.customer_name,
     });
 
-    // Persist botState back to idle after appointment is created
-    await ContactModel.findByIdAndUpdate(contact._id, updates);
+    // createBotAppointment already resets botState to idle on the contact,
+    // so we only apply non-botState updates (e.g. preferredService) here.
+    const nonBotStateUpdates = {};
+    if (updates.preferredService) nonBotStateUpdates.preferredService = updates.preferredService;
+    if (Object.keys(nonBotStateUpdates).length) {
+      await ContactModel.findByIdAndUpdate(contact._id, nonBotStateUpdates);
+    }
 
     await replyToContact({
       app,
@@ -1339,9 +1349,24 @@ webhookRouter.post('/whatsapp', async (req, res) => {
           for (const msg of value.messages || []) {
             if (msg.from === businessPhone) continue;
 
-            // Find business by phoneNumberId
-            const business = await Business.findOne({ 'whatsapp.phoneNumberId': businessPhone }).select('+whatsapp.accessToken');
-            if (!business) continue;
+            // Find business by phoneNumberId — check DB first, then fall back to env variable
+            let business = await Business.findOne({ 'whatsapp.phoneNumberId': businessPhone }).select('+whatsapp.accessToken');
+            if (!business && businessPhone === process.env.WA_PHONE_NUMBER_ID) {
+              // phoneNumberId is in .env but not yet saved to DB — find the first business and use it
+              business = await Business.findOne({}).select('+whatsapp.accessToken');
+              if (business) {
+                logger.warn(`Business found via env fallback. Save WhatsApp settings in Settings page to fix this properly.`);
+                // Auto-save the phoneNumberId to DB so future lookups work
+                await Business.findByIdAndUpdate(business._id, {
+                  'whatsapp.phoneNumberId': businessPhone,
+                  'whatsapp.wabaId': process.env.WA_WABA_ID || business.whatsapp?.wabaId,
+                  'whatsapp.verifyToken': process.env.WA_VERIFY_TOKEN || business.whatsapp?.verifyToken,
+                  'whatsapp.isConnected': true,
+                  'whatsapp.connectedPhone': '+91 ' + String(process.env.WA_PHONE_NUMBER_ID || '').slice(-10),
+                });
+              }
+            }
+            if (!business) { logger.warn(`No business found for phoneNumberId: ${businessPhone}`); continue; }
 
             // Save message text and normalize incoming text
             const text = msg.text?.body || msg.interactive?.button_reply?.title || msg.interactive?.list_reply?.title || '[media]';
@@ -1351,33 +1376,44 @@ webhookRouter.post('/whatsapp', async (req, res) => {
             const normalizedText = normalizeText(text).toLowerCase();
             const senderLast10 = normalizedSender.slice(-10);
 
-            // Reset contact list when the special number sends hi
-            if (senderLast10 === '9345578103' && normalizedText === 'hi') {
-              await ChatMessage.deleteMany({ business: business._id });
-              await ContactModel.deleteMany({ business: business._id });
-            }
-
             // Upsert contact
             const profile = value.contacts?.find(c => c.wa_id === msg.from);
             let contact = await resolveWhatsAppContact(business, msg.from, profile);
 
-            // Save message
-            await ChatMessage.create({
-              business: business._id,
-              contact: contact._id,
-              direction: 'inbound',
-              type: msg.type || 'text',
-              content: text,
-              waMessageId: msg.id,
-              waTimestamp: new Date(parseInt(msg.timestamp) * 1000),
-              status: 'delivered',
-            });
+            // Deduplicate incoming WhatsApp message — skip if already stored
+            if (msg.id) {
+              const alreadyStored = await ChatMessage.exists({ waMessageId: msg.id });
+              if (alreadyStored) {
+                logger.info(`Skipping duplicate webhook message ${msg.id}`);
+                continue;
+              }
+            }
 
-            // Update contact
-            await ContactModel.findByIdAndUpdate(contact._id, {
-              lastMessageAt: new Date(),
-              $inc: { totalMessages: 1 },
-            });
+            // Save message
+            try {
+              const savedMsg = await ChatMessage.create({
+                business: business._id,
+                contact: contact._id,
+                direction: 'inbound',
+                type: msg.type || 'text',
+                content: text,
+                waMessageId: msg.id,
+                waTimestamp: new Date(parseInt(msg.timestamp) * 1000),
+                status: 'delivered',
+                sentBy: 'system',
+                isRead: false,
+              });
+              logger.info(`ChatMessage saved OK: ${savedMsg._id}`);
+            } catch (saveErr) {
+              logger.error(`ChatMessage.create FAILED: ${saveErr.message} | ${JSON.stringify(saveErr.errors)}`);
+            }
+
+            // Update contact stats and re-fetch so botState is fresh (not stale)
+            contact = await ContactModel.findByIdAndUpdate(
+              contact._id,
+              { lastMessageAt: new Date(), $inc: { totalMessages: 1 } },
+              { new: true }
+            );
 
             // Emit to connected clients
             const io = req.app.get('io');
