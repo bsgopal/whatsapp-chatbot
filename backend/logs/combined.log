@@ -1559,3 +1559,11 @@
 {"level":"info","message":"🚀 WA Appt OS Server running on port 5001 [development]","timestamp":"2026-04-14 12:17:34"}
 {"level":"info","message":"📡 Socket.IO ready","timestamp":"2026-04-14 12:17:34"}
 {"level":"info","message":"Socket connected: yOlelHBa1pe4EbSjAAAB","timestamp":"2026-04-14 12:17:36"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2026-04-14 12:31:40"}
+{"level":"info","message":"🚀 WA Appt OS Server running on port 5001 [development]","timestamp":"2026-04-14 12:31:40"}
+{"level":"info","message":"📡 Socket.IO ready","timestamp":"2026-04-14 12:31:40"}
+{"level":"info","message":"Socket connected: KAxKP_NOTLUBSRt2AAAB","timestamp":"2026-04-14 12:31:41"}
+{"level":"info","message":"Socket disconnected: KAxKP_NOTLUBSRt2AAAB","timestamp":"2026-04-14 12:52:37"}
+{"level":"info","message":"MongoDB Connected: localhost","timestamp":"2026-04-14 17:51:27"}
+{"level":"info","message":"🚀 WA Appt OS Server running on port 5001 [development]","timestamp":"2026-04-14 17:51:27"}
+{"level":"info","message":"📡 Socket.IO ready","timestamp":"2026-04-14 17:51:27"}

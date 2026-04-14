@@ -25,7 +25,11 @@ router.get('/', async (req, res, next) => {
       .limit(parseInt(limit))
       .lean();
 
-    res.json({ success: true, data: contacts, pagination: { total, page: parseInt(page), pages: Math.ceil(total / parseInt(limit)) } });
+    res.json({
+      success: true,
+      data: contacts,
+      pagination: { total, page: parseInt(page), pages: Math.ceil(total / parseInt(limit)) },
+    });
   } catch (err) { next(err); }
 });
 
@@ -48,6 +52,7 @@ router.post('/', async (req, res, next) => {
 
     const existing = await Contact.findOne({ business: req.user.business, phone: normalizedPhone });
     if (existing) return next(new AppError('Contact with this phone already exists', 400));
+
     const contact = await Contact.create({
       business: req.user.business,
       name: name.trim(),
@@ -58,6 +63,13 @@ router.post('/', async (req, res, next) => {
       notes,
       tags,
       source: 'manual',
+      // Mark as profile-complete since manually added with full details
+      customerProfile: {
+        providedName: name.trim(),
+        isProfileComplete: true,
+        firstCapturedAt: new Date(),
+        lastUpdatedAt: new Date(),
+      },
     });
     res.status(201).json({ success: true, data: contact });
   } catch (err) { next(err); }
@@ -68,6 +80,17 @@ router.put('/:id', async (req, res, next) => {
     const updates = { ...req.body };
     if (updates.name !== undefined) updates.name = updates.name.trim();
     if (updates.phone !== undefined) updates.phone = normalizePhone(updates.phone);
+
+    // When manually updating name, also sync customerProfile.providedName
+    if (updates.name) {
+      updates['customerProfile.providedName'] = updates.name;
+      updates['customerProfile.lastUpdatedAt'] = new Date();
+      updates['customerProfile.isProfileComplete'] = true;
+    }
+
+    // Never allow totalSpent to be updated directly via this endpoint
+    // It must only be updated via the payment confirmation flow
+    delete updates.totalSpent;
 
     const contact = await Contact.findOneAndUpdate(
       { _id: req.params.id, business: req.user.business },

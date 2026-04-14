@@ -10,12 +10,30 @@
 //  • Understands dates: "tomorrow", "next monday", "14 apr", ISO
 //  • Understands times: "3pm", "14:00", "afternoon", "10:30 am"
 //  • Contextual recovery with helpful re-prompts on bad input
+//  • Timezone-aware (IST by default, reads from business.timezone)
 // ============================================================
 
-const moment  = require('moment');
+const moment  = require('moment-timezone');
 const { getBusiness, refreshBusiness } = require('../data/businesses');
 const session = require('./sessionManager');
 const store   = require('./appointmentStore');
+
+// ─── Timezone helper ──────────────────────────────────────────
+// All "now" / "today" calculations go through this.
+// biz.timezone should be e.g. "Asia/Kolkata". Falls back to IST.
+let _bizTimezone = 'Asia/Kolkata';
+
+function setTimezone(tz) {
+  if (tz && tz.trim()) _bizTimezone = tz.trim();
+}
+
+function nowInBiz() {
+  return moment().tz(_bizTimezone);
+}
+
+function todayInBiz() {
+  return nowInBiz().startOf('day');
+}
 
 // ─── Intent keyword sets ─────────────────────────────────────
 const GREETINGS     = new Set(['hi','hello','hey','hii','hai','helo','sup','yo','start','begin','restart','hola','howdy']);
@@ -73,9 +91,10 @@ function parseIdx(text, max) {
   return (!isNaN(n)&&n>=1&&n<=max) ? n-1 : null;
 }
 
+// FIX: All date parsing now uses timezone-aware "today" via todayInBiz()
 function extractDate(text) {
   const lower = text.toLowerCase().trim();
-  const today = moment().startOf('day');
+  const today = todayInBiz(); // ← was: moment().startOf('day') — wrong for IST
   if (/\btoday\b/.test(lower))       return today.clone();
   if (/\btomorrow\b/.test(lower))    return today.clone().add(1,'day');
   if (/\bday after\b/.test(lower))   return today.clone().add(2,'day');
@@ -87,10 +106,14 @@ function extractDate(text) {
     return d;
   }
   const iso=text.match(/\b(\d{4})-(\d{2})-(\d{2})\b/);
-  if (iso) { const m=moment(`${iso[1]}-${iso[2]}-${iso[3]}`,'YYYY-MM-DD'); return m.isValid()?m:null; }
+  if (iso) {
+    // Parse the ISO date in business timezone
+    const m=moment.tz(`${iso[1]}-${iso[2]}-${iso[3]}`,'YYYY-MM-DD',_bizTimezone);
+    return m.isValid()?m:null;
+  }
   const dm=text.match(/\b(\d{1,2})[\/\-](\d{1,2})\b/);
   if (dm) {
-    const m=moment(`${dm[2]}-${dm[1]}`,'MM-DD').year(moment().year());
+    const m=moment.tz(`${dm[2]}-${dm[1]}`,'MM-DD',_bizTimezone).year(nowInBiz().year());
     if (m.isBefore(today)) m.add(1,'year');
     return m.isValid()?m:null;
   }
@@ -99,7 +122,7 @@ function extractDate(text) {
   const mMatch=lower.match(mRe);
   if (mMatch) {
     const dayN=mMatch[1]||mMatch[4], monN=mMatch[2]||mMatch[3];
-    const m=moment(`${dayN} ${monN}`,'D MMM').year(moment().year());
+    const m=moment.tz(`${dayN} ${monN}`,'D MMM',_bizTimezone).year(nowInBiz().year());
     if (!m.isValid()) return null;
     if (m.isBefore(today)) m.add(1,'year');
     return m;
@@ -107,26 +130,29 @@ function extractDate(text) {
   return null;
 }
 
+// FIX: extractTime returns a timezone-aware moment for "now"
 function extractTime(text) {
   const lower=text.toLowerCase().trim();
+  // Use start-of-day in business timezone as the base
+  const base = todayInBiz(); // ← was: moment().startOf('day')
   let m=lower.match(/\b(\d{1,2}):(\d{2})\s*(am|pm)?\b/);
   if (m) {
     let h=parseInt(m[1],10), min=parseInt(m[2],10);
     if (m[3]==='pm'&&h!==12) h+=12;
     if (m[3]==='am'&&h===12) h=0;
-    if (h>=0&&h<=23&&min>=0&&min<=59) return moment().startOf('day').hours(h).minutes(min);
+    if (h>=0&&h<=23&&min>=0&&min<=59) return base.clone().hours(h).minutes(min).seconds(0);
   }
   m=lower.match(/\b(\d{1,2})\s*(am|pm)\b/);
   if (m) {
     let h=parseInt(m[1],10);
     if (m[2]==='pm'&&h!==12) h+=12;
     if (m[2]==='am'&&h===12) h=0;
-    if (h>=0&&h<=23) return moment().startOf('day').hours(h);
+    if (h>=0&&h<=23) return base.clone().hours(h).minutes(0).seconds(0);
   }
-  if (/\bmorn/.test(lower))      return moment().startOf('day').hours(10);
-  if (/\bnoon\b/.test(lower))    return moment().startOf('day').hours(12);
-  if (/\bafternoon\b/.test(lower)) return moment().startOf('day').hours(14);
-  if (/\bevening\b/.test(lower)) return moment().startOf('day').hours(17);
+  if (/\bmorn/.test(lower))        return base.clone().hours(10).minutes(0).seconds(0);
+  if (/\bnoon\b/.test(lower))      return base.clone().hours(12).minutes(0).seconds(0);
+  if (/\bafternoon\b/.test(lower)) return base.clone().hours(14).minutes(0).seconds(0);
+  if (/\bevening\b/.test(lower))   return base.clone().hours(17).minutes(0).seconds(0);
   return null;
 }
 
@@ -134,7 +160,7 @@ function extractTime(text) {
 function getAvailableDates(biz, count=7) {
   const openDays=new Set((biz.businessHours||[]).filter(h=>h.isOpen).map(h=>h.day.toLowerCase()));
   const dayNames=['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
-  const today=moment().startOf('day');
+  const today=todayInBiz(); // ← was: moment().startOf('day')
   const result=[];
   let d=today.clone();
   while (result.length<count) {
@@ -157,7 +183,14 @@ function getSlotsForStaff(biz, staffMember) {
   const durations=(biz.services||[]).map(s=>s.duration||30).filter(d=>d>0);
   const step=durations.length>0?Math.min(...durations):30;
   const slots=[];
-  let cur=moment(start,'HH:mm'), fin=moment(end,'HH:mm');
+  // FIX: parse slot times relative to today in business timezone
+  const base = todayInBiz(); // ← was: moment() base which could be UTC
+  let cur=base.clone().startOf('day').add(
+    parseInt(start.split(':')[0],10),'hours'
+  ).add(parseInt(start.split(':')[1]||'0',10),'minutes');
+  const fin=base.clone().startOf('day').add(
+    parseInt(end.split(':')[0],10),'hours'
+  ).add(parseInt(end.split(':')[1]||'0',10),'minutes');
   while (cur.isBefore(fin)) { slots.push(cur.clone()); cur.add(step,'minutes'); }
   return slots;
 }
@@ -168,7 +201,8 @@ function resolveDate(text, biz) {
   if (idx!==null) return {moment:dates[idx],dateStr:dates[idx].format('YYYY-MM-DD')};
   const extracted=extractDate(text);
   if (!extracted) return null;
-  if (extracted.isBefore(moment().startOf('day'))) return {past:true};
+  const today=todayInBiz(); // ← was: moment().startOf('day')
+  if (extracted.isBefore(today,'day')) return {past:true};
   if (!isOpenDate(biz,extracted)) return {closed:true,day:extracted.format('dddd')};
   return {moment:extracted,dateStr:extracted.format('YYYY-MM-DD')};
 }
@@ -224,7 +258,7 @@ function buildServiceMenu(biz, intro) {
 
 function buildDateMenu(biz, hint) {
   const prompt=msg(biz,'datePrompt','📅 *When would you like to come in?*');
-  const today=moment().startOf('day');
+  const today=todayInBiz(); // ← was: moment().startOf('day')
   const dates=getAvailableDates(biz,7);
   const list=dates.map((d,i)=>{
     const diff=d.diff(today,'days');
@@ -241,21 +275,32 @@ async function buildSlotMenu(biz, staffMember, date) {
   const slots=getSlotsForStaff(biz,staffMember);
   const takenRaw=await store.getTakenSlots(biz._id,staffMember.id,date);
   const takenSet=new Set(takenRaw);
+
+  // FIX: For today, grey out slots that are in the past (current IST time)
+  const now=nowInBiz(); // ← was missing entirely — past slots were never hidden
+  const isToday=(date===now.format('YYYY-MM-DD'));
+
   const lines=slots.map((s,i)=>{
-    const str=s.format('hh:mm A');
-    return takenSet.has(str)?`${i+1}️⃣  ${str} ❌ _Booked_`:`${i+1}️⃣  ${str} ✅`;
+    const slotStr=s.format('hh:mm A');
+    if (takenSet.has(slotStr))             return `${i+1}️⃣  ${slotStr} ❌ _Booked_`;
+    if (isToday && s.isSameOrBefore(now))  return `${i+1}️⃣  ${slotStr} ⏳ _Past_`;
+    return `${i+1}️⃣  ${slotStr} ✅`;
   });
+
   const prompt=msg(biz,'timePrompt','⏰ *Choose a time slot:*');
-  const allTaken=slots.every(s=>takenSet.has(s.format('hh:mm A')));
-  const footer=allTaken
-    ?'\n\n⚠️ _All slots are booked for this day. Reply *back* to choose another date._'
+  const allUnavailable=slots.every(s=>{
+    const slotStr=s.format('hh:mm A');
+    return takenSet.has(slotStr)||(isToday&&s.isSameOrBefore(now));
+  });
+  const footer=allUnavailable
+    ?'\n\n⚠️ _All slots are booked or past for this day. Reply *back* to choose another date._'
     :'\n\nReply with a *number* or *time* (e.g. "3pm", "14:00"), or *0* for menu.';
-  const dateLabel=moment(date).format('ddd, DD MMM YYYY');
+  const dateLabel=moment.tz(date,'YYYY-MM-DD',_bizTimezone).format('ddd, DD MMM YYYY');
   return `${prompt} for *${staffMember.name}* on *${dateLabel}*:\n\n${lines.join('\n')}${footer}`;
 }
 
 function buildConfirmPrompt({ biz, staff, service, date, slot, name, isWalkin=false }) {
-  const dateLabel=moment(date).format('ddd, DD MMM YYYY');
+  const dateLabel=moment.tz(date,'YYYY-MM-DD',_bizTimezone).format('ddd, DD MMM YYYY');
   const slotLabel=(typeof slot==='string')?slot:slot.format('hh:mm A');
   const walkinTag=isWalkin?'\n🚶 *Walk-in booking*':'';
   return `📋 *Please confirm your booking:*\n\n`+
@@ -271,7 +316,7 @@ function buildConfirmPrompt({ biz, staff, service, date, slot, name, isWalkin=fa
 }
 
 function buildSuccess({ biz, appt, service, staff, date, slot, name, isWalkin=false }) {
-  const dateLabel=moment(date).format('ddd, DD MMM YYYY');
+  const dateLabel=moment.tz(date,'YYYY-MM-DD',_bizTimezone).format('ddd, DD MMM YYYY');
   const slotLabel=(typeof slot==='string')?slot:slot.format('hh:mm A');
   const tmpl=msg(biz,'confirmationTemplate','✅ *Your appointment is confirmed!*');
   return `${tmpl}\n\n`+
@@ -293,18 +338,18 @@ function buildViewAppointments(appts) {
   if (!appts||appts.length===0) return '📋 You have *no appointments* yet.\n\nReply *1* to book one, or *0* for main menu.';
   const active=appts.filter(a=>a.status==='confirmed');
   const cancelled=appts.filter(a=>a.status==='cancelled');
-  const today=moment().format('YYYY-MM-DD');
+  const today=nowInBiz().format('YYYY-MM-DD'); // ← was: moment().format('YYYY-MM-DD')
   let out='📋 *Your Appointments:*\n';
   if (active.length>0) {
     out+=`\n✅ *Upcoming (${active.length}):*\n`;
     active.forEach(a=>{
       const tag=a.date===today?' 🔔 *TODAY*':a.date<today?' _(past)_':'';
-      out+=`\n🔖 \`${a.id}\`${tag}\n   🏢 ${a.businessName}\n   ✂️ ${a.serviceName||'—'}\n   👤 ${a.staffName}\n   📅 ${moment(a.date).format('ddd, DD MMM')} at ${a.slot}\n   💰 ${fmt(a.servicePrice,null)}\n`;
+      out+=`\n🔖 \`${a.id}\`${tag}\n   🏢 ${a.businessName}\n   ✂️ ${a.serviceName||'—'}\n   👤 ${a.staffName}\n   📅 ${moment.tz(a.date,'YYYY-MM-DD',_bizTimezone).format('ddd, DD MMM')} at ${a.slot}\n   💰 ${fmt(a.servicePrice,null)}\n`;
     });
   }
   if (cancelled.length>0) {
     out+=`\n❌ *Cancelled (${cancelled.length}):*\n`;
-    cancelled.forEach(a=>{out+=`\n🔖 \`${a.id}\` — ${a.businessName} _(${moment(a.date).format('DD MMM')} ${a.slot})_\n`;});
+    cancelled.forEach(a=>{out+=`\n🔖 \`${a.id}\` — ${a.businessName} _(${moment.tz(a.date,'YYYY-MM-DD',_bizTimezone).format('DD MMM')} ${a.slot})_\n`;});
   }
   out+='\nReply *0* for main menu.';
   return out;
@@ -348,7 +393,7 @@ async function startCancel(phone, biz) {
   if (!active.length) return '❌ You have no active appointments to cancel.\n\nReply *0* for main menu.';
   session.set(phone,'CANCEL_SELECT',{cancelList:active});
   return `🗑️ *Which appointment would you like to cancel?*\n\n`+
-    active.map((a,i)=>`${i+1}️⃣  \`${a.id}\`\n   ✂️ ${a.serviceName||'—'}\n   👤 ${a.staffName}\n   📅 ${moment(a.date).format('ddd, DD MMM')} at ${a.slot}`).join('\n\n')+
+    active.map((a,i)=>`${i+1}️⃣  \`${a.id}\`\n   ✂️ ${a.serviceName||'—'}\n   👤 ${a.staffName}\n   📅 ${moment.tz(a.date,'YYYY-MM-DD',_bizTimezone).format('ddd, DD MMM')} at ${a.slot}`).join('\n\n')+
     '\n\nReply with the *number*.';
 }
 
@@ -357,7 +402,7 @@ async function startReschedule(phone, biz) {
   if (!active.length) return '❌ You have no active appointments to reschedule.\n\nReply *0* for main menu.';
   session.set(phone,'RESCHEDULE_SELECT',{rescheduleList:active});
   return `🔄 *Which appointment would you like to reschedule?*\n\n`+
-    active.map((a,i)=>`${i+1}️⃣  \`${a.id}\`\n   ✂️ ${a.serviceName||'—'}\n   👤 ${a.staffName}\n   📅 ${moment(a.date).format('ddd, DD MMM')} at ${a.slot}`).join('\n\n')+
+    active.map((a,i)=>`${i+1}️⃣  \`${a.id}\`\n   ✂️ ${a.serviceName||'—'}\n   👤 ${a.staffName}\n   📅 ${moment.tz(a.date,'YYYY-MM-DD',_bizTimezone).format('ddd, DD MMM')} at ${a.slot}`).join('\n\n')+
     '\n\nReply with the *number*.';
 }
 
@@ -372,6 +417,9 @@ async function handleMessage(phone, rawText) {
     console.error('[flow] Could not load business:', err.message);
     return `⚠️ The bot is not fully configured. Please contact the administrator.\n\nError: ${err.message}`;
   }
+
+  // FIX: Load the business timezone on every message so it's always current
+  setTimezone(biz.timezone || 'Asia/Kolkata');
 
   // Admin command
   if (lower==='refresh_bot_config') {
@@ -431,7 +479,7 @@ async function handleMessage(phone, rawText) {
     const picked=idx!==null?biz.services[idx]:fuzzyFind(text,biz.services);
     if (!picked) return `${msg(biz,'invalidServiceMessage',"❓ I couldn't match that service.")}\n\n${buildServiceMenu(biz)}`;
     if (isWalkin) {
-      const today=moment().format('YYYY-MM-DD');
+      const today=nowInBiz().format('YYYY-MM-DD'); // ← was: moment().format('YYYY-MM-DD')
       session.set(phone,'BOOK_SELECT_SLOT',{service:picked,date:today,isWalkin:true});
       return await buildSlotMenu(biz,s.data.staff,today);
     }
@@ -455,6 +503,14 @@ async function handleMessage(phone, rawText) {
     const resolved=await resolveSlot(text,biz,staff,date);
     if (!resolved)      return `${msg(biz,'invalidTimeMessage','❓ I didn\'t catch that time.')}\n\n${await buildSlotMenu(biz,staff,date)}`;
     if (resolved.taken) return `${msg(biz,'slotUnavailableMessage','❌ That slot is already booked.')} Please choose another.\n\n${await buildSlotMenu(biz,staff,date)}`;
+
+    // FIX: Reject past slots when booking for today
+    const now=nowInBiz();
+    const isToday=(date===now.format('YYYY-MM-DD'));
+    if (isToday && resolved.slot.isSameOrBefore(now)) {
+      return `⚠️ That time has already passed.\n\n${await buildSlotMenu(biz,staff,date)}`;
+    }
+
     session.set(phone,'BOOK_ASK_NAME',{slot:resolved.slotStr,isWalkin:isWalkin||false});
     return `📝 ${msg(biz,'namePromptMessage','Please enter your *full name* to confirm the booking.')}`;
   }
@@ -501,7 +557,7 @@ async function handleMessage(phone, rawText) {
     if (idx===null) return `❓ Please choose a number between 1 and ${cancelList.length}.`;
     session.set(phone,'CANCEL_CONFIRM',{appt:cancelList[idx]});
     const a=cancelList[idx];
-    return `⚠️ Are you sure you want to cancel:\n\n🔖 \`${a.id}\`\n✂️ ${a.serviceName||'—'}\n📅 ${moment(a.date).format('ddd, DD MMM')} at ${a.slot}\n\nReply *YES* to confirm or *NO* to keep it.`;
+    return `⚠️ Are you sure you want to cancel:\n\n🔖 \`${a.id}\`\n✂️ ${a.serviceName||'—'}\n📅 ${moment.tz(a.date,'YYYY-MM-DD',_bizTimezone).format('ddd, DD MMM')} at ${a.slot}\n\nReply *YES* to confirm or *NO* to keep it.`;
   }
 
   if (s.step==='CANCEL_CONFIRM') {
@@ -510,7 +566,7 @@ async function handleMessage(phone, rawText) {
       session.set(phone,'DONE');
       if (!result.success) return '❌ Could not cancel. Try again from the main menu.';
       const a=result.appointment;
-      return `✅ *Appointment Cancelled*\n\n🔖 ID: \`${a.id}\`\n🏢 ${a.businessName}\n✂️ ${a.serviceName||'—'}\n📅 ${moment(a.date).format('ddd, DD MMM YYYY')} at ${a.slot}\n\nReply *0* for main menu.`;
+      return `✅ *Appointment Cancelled*\n\n🔖 ID: \`${a.id}\`\n🏢 ${a.businessName}\n✂️ ${a.serviceName||'—'}\n📅 ${moment.tz(a.date,'YYYY-MM-DD',_bizTimezone).format('ddd, DD MMM YYYY')} at ${a.slot}\n\nReply *0* for main menu.`;
     }
     if (CONFIRM_NO.has(lower)||text==='2') { session.reset(phone); return `✅ Your appointment is kept.\n\nReply *0* for main menu.`; }
     return `Please reply *YES* to cancel or *NO* to keep the appointment.`;
@@ -546,7 +602,7 @@ async function handleMessage(phone, rawText) {
     session.set(phone,'DONE');
     if (!result.success) return '❌ Could not reschedule. Please try again.';
     const a=result.appointment;
-    return `✅ *Appointment Rescheduled!*\n\n🔖 ID: \`${a.id}\`\n🏢 ${a.businessName}\n✂️ ${a.serviceName||'—'}\n👤 ${a.staffName}\n📅 *New Date:* ${moment(a.date).format('ddd, DD MMM YYYY')} at ${a.slot}\n\nReply *0* for main menu.`;
+    return `✅ *Appointment Rescheduled!*\n\n🔖 ID: \`${a.id}\`\n🏢 ${a.businessName}\n✂️ ${a.serviceName||'—'}\n👤 ${a.staffName}\n📅 *New Date:* ${moment.tz(a.date,'YYYY-MM-DD',_bizTimezone).format('ddd, DD MMM YYYY')} at ${a.slot}\n\nReply *0* for main menu.`;
   }
 
   // ── Fallback ──────────────────────────────────────────────
